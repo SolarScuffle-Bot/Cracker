@@ -13,7 +13,7 @@ type Entity_t: any;
 ```
 
 ```lua
-type Buffer_t: { Entity };
+type Buffer_t: { Entity_t };
 ```
 
 ```lua
