@@ -68,7 +68,7 @@ Module.EnterStates = function(StateNames, Entities)
 		end
 
 		if #EntitiesNotInState == 0 then continue end
-		State.OnEnterState(EntitiesNotInState)
+		if State.OnEnterState(EntitiesNotInState) then continue end
 
 		for _, Entity in ipairs(EntitiesNotInState) do
 			State.Collection[Entity] = true
@@ -88,7 +88,7 @@ Module.ExitStates = function(StateNames, Entities)
 		end
 
 		if #EntitiesInState == 0 then continue end
-		State.OnExitState(EntitiesInState)
+		if State.OnExitState(EntitiesInState) then continue end
 
 		for _, Entity in ipairs(EntitiesInState) do
 			State.Collection[Entity] = nil
