@@ -38,8 +38,20 @@ type Template_t = {
     to: { StateName_t }?;
     
     OnEnterBuffer: (Entity_t)? -> bool?;
-    
+    onEnterBuffer: (Entity_t)? -> bool?;
+    on_enter_buffer: (Entity_t)? -> bool?;
+
     OnExitBuffer: (Buffer_t)? -> bool?;
+    onExitBuffer: (Buffer_t)? -> bool?;
+    on_exit_buffer: (Buffer_t)? -> bool?;
+
+    OnExitFromStates: (Buffer_t, { StateName_t }, { StateName_t })? -> nil
+    onExitFromStates: (Buffer_t, { StateName_t }, { StateName_t })? -> nil
+    on_exit_from_states: (Buffer_t, { StateName_t }, { StateName_t })? -> nil
+
+    OnEnterToStates: (Buffer_t, { StateName_t })? -> nil
+    onEnterToStates: (Buffer_t, { StateName_t })? -> nil
+    on_enter_to_states: (Buffer_t, { StateName_t })? -> nil
 }
 ```
 
@@ -54,6 +66,10 @@ type Transition = {
     OnEnterBuffer: (Entity_t) -> bool?;
 
     OnExitBuffer: (Buffer_t) -> bool?;
+
+    OnExitFromStates: (Buffer_t, { StateName_t }, { StateName_t }) -> nil;
+
+    OnEnterToStates: (Buffer_t, { StateName_t }) -> nil;
 }
 ```
 
@@ -107,3 +123,23 @@ Sets all Entities to nil in each From State and to true in each To State in the 
 .DebugText() -> string
 ```
 Returns a string of most useful debugging information.
+
+```lua
+.OnEnterBuffer(Entity: Entity_t) -> bool?
+```
+Called before Entity is inserted into the buffer. If it returns a truthy value the Entity will not be inserted.
+
+```lua
+.OnExitBuffer(Buffer: Buffer_t) -> bool?
+```
+Called before all Entities in Buffer are removed from their From States and added to their To States. If it returns a truthy value the buffer will not be cleared.
+
+```lua
+.OnExitFromStates(Buffer: Buffer_t, FromOr: { StateName_t }, FromAnd: { StateName_t })
+```
+Called right before Entities in Buffer are removed from the From States.
+
+```lua
+.OnEnterToStates(Buffer: Buffer_t, FromOr: { StateName_t }, FromAnd: { StateName_t })
+```
+Called right before Entities in Buffer are added to the To States.
