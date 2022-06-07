@@ -30,9 +30,9 @@ type Template_t = {
     fromOr : { StateName_t }?;
     from_or: { StateName_t }?;
     
-    FromAny : { StateName_t }?;
-    fromAny : { StateName_t }?;
-    from_any: { StateName_t }?;
+    FromAnd : { StateName_t }?;
+    fromAnd : { StateName_t }?;
+    from_and: { StateName_t }?;
     
     To: { StateName_t }?;
     to: { StateName_t }?;
