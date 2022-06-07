@@ -18,10 +18,27 @@ type Buffer_t: { Entity_t };
 
 ```lua
 type StateName_t: any;
+
+```lua
+type StateTemplate_t: {    
+    OnEnterState: ({ Entity_t }) -> nil
+    onEnterState: ({ Entity_t }) -> nil
+    on_enter_state: ({ Entity_t }) -> nil
+
+    OnExitState: ({ Entity_t }) -> nil
+    onExitState: ({ Entity_t }) -> nil
+    on_exit_state: ({ Entity_t }) -> nil
+};
 ```
 
 ```lua
-type State_t: { [Entity_t]: true };
+type State_t: {
+    Collection: { [Entity_t]: true };
+    
+    OnEnterState: ({ Entity_t }) -> nil
+
+    OnExitState: ({ Entity_t }) -> nil
+};
 ```
 
 ```lua
@@ -75,71 +92,71 @@ type Transition = {
 
 ### Methods
 ```lua
-.CreateTransition(TransitionName: TransitionName_t, Template: Template_t)
+Module.CreateTransition(TransitionName: TransitionName_t, Template: Template_t)
 ```
 Internally creates a Transition struct using the Template at TransitionName. Creates any States that do not exist at the time of calling.
 
 ```lua
-.DeleteTransition(TransitionName: TransitionName_t)
+Module.DeleteTransition(TransitionName: TransitionName_t)
 ```
 Clears the Transition struct's buffer and internally deletes the Transition struct with TransitionName.
 
 ```lua
-.GetTransition(TransitionName: TransitionName_t) -> Transition_t?
+Module.GetTransition(TransitionName: TransitionName_t) -> Transition_t?
 ```
 Asserts the Transition struct at TransitionName exists, then returns it. (Only recommended for debugging use)
 
 ```lua
-.CreateState(StateName: StateName_t, Entities: { Entity_t }?)
+Module.CreateState(StateName: StateName_t, Entities: { Entity_t }?)
 ```
 Internally creates a State table at StateName with Entities or {}.
 
 ```lua
-.GetState(StateName: StateName_t) -> State_t?
+Module.GetState(StateName: StateName_t) -> State_t?
 ```
 Returns the State table at StateName if it exists. (Only recommended for debugging use)
 
 ```lua
-.EnterStates(StateNames: { StateName_t }, Entities: { Entity_t })
+Module.EnterStates(StateNames: { StateName_t }, Entities: { Entity_t })
 ```
 Sets each Entity to true in States at names listed in StateNames. Creates any States that do not exist at the time of calling.
 
 ```lua
-.ExitStates(StateNames: { StateName_t }, Entities: { Entity_t })
+Module.ExitStates(StateNames: { StateName_t }, Entities: { Entity_t })
 ```
 Sets each Entity to nil in States at names listed in StateNames. Ignores non-existant States.
 
 ```lua
-.EnterBuffer(TransitionName: TransitionName_t, Entities: { Entity_t })
+Module.EnterBuffer(TransitionName: TransitionName_t, Entities: { Entity_t })
 ```
 Inserts each Entity into the Transition at TransitionName's buffer if it is in all required States. Cancels before inserting if Transition.OnEnterBuffer(Entity) is truthy. Creates any States that do not exist at the time of calling.
 
 ```lua
-.ExitBuffer(TransitionName: TransitionName_t, Entities: { Entity_t })
+Module.ExitBuffer(TransitionName: TransitionName_t, Entities: { Entity_t })
 ```
 Sets all Entities to nil in each From State and to true in each To State in the Transition at TransitionName. Cancels before bulk insertion if Transition.OnExitBuffer(Transition.Buffer) is truthy. Creates any States that do not exist at the time of calling. Ignores non-existant States.
 
 ```lua
-.DebugText() -> string
+Module.DebugText() -> string
 ```
 Returns a string of most useful debugging information.
 
 ```lua
-.OnEnterBuffer(Entity: Entity_t) -> bool?
+Transition.OnEnterBuffer(Entity: Entity_t) -> bool?
 ```
 Called before Entity is inserted into the buffer. If it returns a truthy value the Entity will not be inserted.
 
 ```lua
-.OnExitBuffer(Buffer: Buffer_t) -> bool?
+Transition.OnExitBuffer(Buffer: Buffer_t) -> bool?
 ```
 Called before all Entities in Buffer are removed from their From States and added to their To States. If it returns a truthy value the buffer will not be cleared.
 
 ```lua
-.OnExitFromStates(Buffer: Buffer_t, FromOr: { StateName_t }, FromAnd: { StateName_t })
+State.OnEnterState(Entities: { Entity_t })
 ```
-Called right before Entities in Buffer are removed from the From States.
+Called before all Entities are added to the State. Entities are filtered so only Entities that will be added are passed in.
 
 ```lua
-.OnEnterToStates(Buffer: Buffer_t, FromOr: { StateName_t }, FromAnd: { StateName_t })
+State.OnExitState(Entities: { Entity_t })
 ```
-Called right before Entities in Buffer are added to the To States.
+Called before all Entities are removed from the State. Entities are filtered so only Entities that will be removed are passed in.
