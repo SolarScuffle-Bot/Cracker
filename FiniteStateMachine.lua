@@ -4,33 +4,33 @@ local Transitions = {}
 local Module = {}
 
 Module.CreateTransition = function(TransitionName, Template)
-    assert(not Transitions[TransitionName], "Transition " .. TransitionName .. " already exists")
+	assert(not Transitions[TransitionName], "Transition " .. TransitionName .. " already exists")
 
-    Transitions[TransitionName] = {
-        Buffer        = {};
+	Transitions[TransitionName] = {
+		Buffer        = {};
 
-        FromOr        = Template.FromOr  or Template.fromOr  or Template.from_or  or {};
-        FromAnd       = Template.FromAnd or Template.fromAnd or Template.from_and or {};
-        To            = Template.To      or Template.to      or                      {};
+		FromOr        = Template.FromOr  or Template.fromOr  or Template.from_or  or {};
+		FromAnd       = Template.FromAnd or Template.fromAnd or Template.from_and or {};
+		To            = Template.To      or Template.to      or                      {};
 
-        OnEnterBuffer = Template.OnEnterBuffer or Template.onEnterBuffer or Template.on_enter_buffer or function(Entity) end;
-        OnExitBuffer  = Template.OnExitBuffer  or Template.onExitBuffer  or Template.on_exit_buffer  or function(Buffer) end;
-    }
+		OnEnterBuffer = Template.OnEnterBuffer or Template.onEnterBuffer or Template.on_enter_buffer or function(Entity) end;
+		OnExitBuffer  = Template.OnExitBuffer  or Template.onExitBuffer  or Template.on_exit_buffer  or function(Buffer) end;
+	}
 end
 
 Module.DeleteTransition = function(TransitionName)
-    local Transition = Transitions[TransitionName]
-    assert(Transition, "Transition " .. TransitionName .. " does not exist")
+	local Transition = Transitions[TransitionName]
+	assert(Transition, "Transition " .. TransitionName .. " does not exist")
 
-    table.clear(Transition.Buffer)
-    Transitions[TransitionName] = nil
+	table.clear(Transition.Buffer)
+	Transitions[TransitionName] = nil
 end
 
 Module.GetTransition = function(TransitionName)
-    local Transition = Transitions[TransitionName]
-    assert(Transition, "Transition " .. TransitionName .. " does not exist")
+	local Transition = Transitions[TransitionName]
+	assert(Transition, "Transition " .. TransitionName .. " does not exist")
 
-    return Transition
+	return Transition
 end
 
 Module.CreateState = function(StateName, Entities)
@@ -43,7 +43,7 @@ Module.CreateState = function(StateName, Entities)
 end
 
 Module.GetState = function(StateName)
-    return States[StateName]
+	return States[StateName]
 end
 
 Module.EnterStates = function(StateNames, Entities)
@@ -110,6 +110,37 @@ Module.ExitBuffer = function(TransitionName)
 	table.clear(Transition.Buffer)
 end
 
+--Extras
+
+local function TableToString(Table)
+	local result = "{ "
+	for k, v in pairs(Table) do
+		-- Check the key type (ignore any numerical keys - assume its an array)
+		if type(k) == "string" then
+			result = result.."[\""..k.."\"]".."="
+		end
+
+		-- Check the value type
+		if type(v) == "table" then
+			result = result..TableToString(v)
+		elseif type(v) == "boolean" then
+			result = result..tostring(v)
+		elseif type(v) == "string" then
+			result = result.."\""..v.."\""
+		elseif type(v) == "number" then
+			result = result..v
+		else
+			result = result.."\""..v.."\""
+		end
+		result = result..", "
+	end
+	-- Remove leading commas from the result
+	if result ~= "" then
+		result = result:sub(1, result:len()-1)
+	end
+	return result.." }"
+end
+
 Module.DebugText = function()
 	local Text = "FINITE STATE MACHINE DEBUG TEXT:\n\n"
 
@@ -119,17 +150,17 @@ Module.DebugText = function()
 			table.insert(DebugEntities, Entity)
 		end
 
-		Text ..= "State " .. StateName .. ": { " .. table.concat(DebugEntities, ', ') .. " }\n"
+		Text ..= "State " .. StateName .. ": " .. TableToString(DebugEntities) .. "\n"
 	end
 
 	Text ..= "\n"
 
 	for TransitionName, Transition in pairs(Transitions) do
 		Text ..= "Transition " .. TransitionName .. ": {\n"
-		Text ..= "\tBuffer: { " .. table.concat(Transition.Buffer, ', ') .. " }\n"
-		Text ..= "\tFromOr: { " .. table.concat(Transition.OrSourceNames, ', ') .. " }\n"
-		Text ..= "\tFromAnd: { " .. table.concat(Transition.AndSourceNames, ', ') .. " }\n"
-		Text ..= "\tTo: { " .. table.concat(Transition.TargetNames, ', ') .. " }\n"
+		Text ..= "\tBuffer: " .. TableToString(Transition.Buffer) .. "\n"
+		Text ..= "\tFromOr: " .. TableToString(Transition.FromOr) .. "\n"
+		Text ..= "\tFromAnd: " .. TableToString(Transition.FromAnd) .. "\n"
+		Text ..= "\tTo: " .. TableToString(Transition.To) .. "\n"
 		Text ..= "}\n"
 	end
 
