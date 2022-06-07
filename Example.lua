@@ -1,5 +1,55 @@
 local FSM = require(game.ServerScriptService.FSM)
 
+FSM.CreateState("Happy", {
+    OnEnterState = function(Entities)
+        print("Entities", Entities, "entering Happy")
+    end;
+
+    OnExitState = function(Entities)
+        print("Entities", Entities, "exiting Happy")
+    end;
+})
+
+FSM.CreateState("Afraid", {
+    OnEnterState = function(Entities)
+        print("Entities", Entities, "entering Afraid")
+    end;
+
+    OnExitState = function(Entities)
+        print("Entities", Entities, "exiting Afraid")
+    end;
+})
+
+FSM.CreateState("Disgusted", {
+    OnEnterState = function(Entities)
+        print("Entities", Entities, "entering Disgusted")
+    end;
+
+    OnExitState = function(Entities)
+        print("Entities", Entities, "exiting Disgusted")
+    end;
+})
+
+FSM.CreateState("Angry", {
+    OnEnterState = function(Entities)
+        print("Entities", Entities, "entering Angry")
+    end;
+
+    OnExitState = function(Entities)
+        print("Entities", Entities, "exiting Angry")
+    end;
+})
+
+FSM.CreateState("Sad", {
+    OnEnterState = function(Entities)
+        print("Entities", Entities, "entering Sad")
+    end;
+
+    OnExitState = function(Entities)
+        print("Entities", Entities, "exiting Sad")
+    end;
+})
+
 FSM.CreateTransition("HappyToSad", {
     FromOr = {"Disgusted", "Afraid", "Happy"};
     FromAnd = {"Happy", "Angry"};
@@ -11,14 +61,6 @@ FSM.CreateTransition("HappyToSad", {
 
     OnExitBuffer = function(Buffer)
         print("Buffer HappyToSad", Buffer, "is clearing")
-    end;
-
-    OnExitFromStates = function(Entities, FromOr, FromAnd)
-        print("Entities", Entities, "are exiting states", FromOr, "and", FromAnd)
-    end;
-
-    OnEnterToStates = function(Entities, To)
-        print("Entities", Entities, "are entering states ", To)
     end;
 })
 

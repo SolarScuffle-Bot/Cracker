@@ -3,21 +3,18 @@ local Transitions = {}
 
 local Module = {}
 
-Module.CreateTransition = function(TransitionName, Template)
+Module.CreateTransition = function(TransitionName, TransitionTemplate)
 	assert(not Transitions[TransitionName], "Transition " .. TransitionName .. " already exists")
 
 	Transitions[TransitionName] = {
 		Buffer = {};
 
-		FromOr  = Template.FromOr  or Template.fromOr  or Template.from_or  or {};
-		FromAnd = Template.FromAnd or Template.fromAnd or Template.from_and or {};
-		To      = Template.To      or Template.to      or                      {};
+		FromOr  = TransitionTemplate.FromOr  or TransitionTemplate.fromOr  or TransitionTemplate.from_or  or {};
+		FromAnd = TransitionTemplate.FromAnd or TransitionTemplate.fromAnd or TransitionTemplate.from_and or {};
+		To      = TransitionTemplate.To      or TransitionTemplate.to      or                      {};
 
-		OnEnterBuffer = Template.OnEnterBuffer or Template.onEnterBuffer or Template.on_enter_buffer or function(Entity) end;
-		OnExitBuffer  = Template.OnExitBuffer  or Template.onExitBuffer  or Template.on_exit_buffer  or function(Buffer) end;
-
-		OnExitFromStates = Template.OnExitFromStates or Template.onExitFromStates or Template.on_exit_from_states or function(Entities, FromOr, FromAnd) end;
-		OnEnterToStates  = Template.OnEnterToStates  or Template.onEnterToStates  or Template.on_enter_to_states  or function(Entities, To) end;
+		OnEnterBuffer = TransitionTemplate.OnEnterBuffer or TransitionTemplate.onEnterBuffer or TransitionTemplate.on_enter_buffer or function(Entity) end;
+		OnExitBuffer  = TransitionTemplate.OnExitBuffer  or TransitionTemplate.onExitBuffer  or TransitionTemplate.on_exit_buffer  or function(Buffer) end;
 	}
 end
 
@@ -36,13 +33,15 @@ Module.GetTransition = function(TransitionName)
 	return Transition
 end
 
-Module.CreateState = function(StateName, Entities)
+Module.CreateState = function(StateName, StateTemplate)
 	assert(not States[StateName], "State ".. StateName .. " already exists")
 
-	local State = {}
-	for _, Entity in ipairs(Entities or {}) do
-		State[Entity] = true
-	end
+	local State = {
+        Collection = {};
+
+        OnEnterState = StateTemplate.OnEnterState or StateTemplate.onEnterState or StateTemplate.on_enter_state or function(Entities) end;
+        OnExitState  = StateTemplate.OnExitState  or StateTemplate.onExitState  or StateTemplate.on_exit_state  or function(Entities) end;
+    }
 
 	States[StateName] = State
 
@@ -58,8 +57,17 @@ Module.EnterStates = function(StateNames, Entities)
 		local State = Module.GetState(StateName)
 		if not State then State = Module.CreateState(StateName) end
 
-		for _, Entity in ipairs(Entities) do
-			State[Entity] = true
+        local EntitiesNotInState = {}
+        for _, Entity in ipairs(Entities) do
+            if State.Collection[Entity] then continue end
+            table.insert(EntitiesNotInState, Entity)
+        end
+
+        if #EntitiesNotInState == 0 then continue end
+        State.OnEnterState(EntitiesNotInState)
+
+		for _, Entity in ipairs(EntitiesNotInState) do
+			State.Collection[Entity] = true
 		end
 	end
 end
@@ -69,8 +77,17 @@ Module.ExitStates = function(StateNames, Entities)
 		local State = Module.GetState(StateName)
 		if not State then continue end
 
-		for _, Entity in ipairs(Entities) do
-			State[Entity] = nil
+        local EntitiesInState = {}
+        for _, Entity in ipairs(Entities) do
+            if not State.Collection[Entity] then continue end
+            table.insert(EntitiesInState, Entity)
+        end
+
+        if #EntitiesInState == 0 then continue end
+        State.OnExitState(EntitiesInState)
+
+		for _, Entity in ipairs(EntitiesInState) do
+			State.Collection[Entity] = nil
 		end
 	end
 end
@@ -83,7 +100,7 @@ Module.EnterBuffer = function(TransitionName, Entities)
 		for _, SourceName in ipairs(Transition.FromOr) do
 			local SourceState = Module.GetState(SourceName)
 			if not SourceState then SourceState = Module.CreateState(SourceName) end
-			if not SourceState[Entity] then continue end
+			if not SourceState.Collection[Entity] then continue end
 
 			ValidOr = true
 			break
@@ -93,7 +110,7 @@ Module.EnterBuffer = function(TransitionName, Entities)
 		for _, SourceName in ipairs(Transition.FromAnd) do
 			local SourceState = Module.GetState(SourceName)
 			if not SourceState then SourceState = Module.CreateState(SourceName) end
-			if SourceState[Entity] then continue end
+			if SourceState.Collection[Entity] then continue end
 
 			ValidAnd = false
 			break
@@ -110,11 +127,8 @@ Module.ExitBuffer = function(TransitionName)
 	local Transition = Module.GetTransition(TransitionName)
 	if Transition.OnExitBuffer(Transition.Buffer) then return end
 
-	Transition.OnExitFromStates(Transition.Buffer, Transition.FromOr, Transition.FromAnd)
 	Module.ExitStates(Transition.FromOr, Transition.Buffer)
 	Module.ExitStates(Transition.FromAnd, Transition.Buffer)
-
-	Transition.OnEnterToStates(Transition.Buffer, Transition.To)
 	Module.EnterStates(Transition.To, Transition.Buffer)
 
 	table.clear(Transition.Buffer)
@@ -154,13 +168,13 @@ end
 Module.DebugText = function()
 	local Text = "FINITE STATE MACHINE DEBUG TEXT:\n\n"
 
-	for StateName, Entities in pairs(States) do
+	for _, State in pairs(States) do
 		local DebugEntities = {}
-		for Entity in pairs(Entities) do
+		for Entity in pairs(State.Collection) do
 			table.insert(DebugEntities, Entity)
 		end
 
-		Text ..= "State " .. StateName .. ": " .. TableToString(DebugEntities) .. "\n"
+        Text ..= "\tCollection: " .. TableToString(DebugEntities) .. "\n"
 	end
 
 	Text ..= "\n"
