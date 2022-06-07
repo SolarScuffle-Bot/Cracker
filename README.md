@@ -5,23 +5,23 @@ A data-oriented finite-state-machine as described in the Data Oriented Design bo
 
 ### Data Types
 ```lua
-type TransitionName_t: any;
+type TransitionName_t = any;
 ```
 
 ```lua
-type Entity_t: any;
+type Entity_t = any;
 ```
 
 ```lua
-type Buffer_t: { Entity_t };
+type Buffer_t = { Entity_t };
 ```
 
 ```lua
-type StateName_t: any;
+type StateName_t = any;
 ```
 
 ```lua
-type StateTemplate_t: {    
+type StateTemplate_t = {    
     OnEnterState: ({ Entity_t }) -> nil
     onEnterState: ({ Entity_t }) -> nil
     on_enter_state: ({ Entity_t }) -> nil
@@ -33,7 +33,7 @@ type StateTemplate_t: {
 ```
 
 ```lua
-type State_t: {
+type State_t = {
     Collection: { [Entity_t]: true };
     
     OnEnterState: ({ Entity_t }) -> nil
