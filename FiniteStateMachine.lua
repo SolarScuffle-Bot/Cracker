@@ -168,13 +168,13 @@ end
 Module.DebugText = function()
 	local Text = "FINITE STATE MACHINE DEBUG TEXT:\n\n"
 
-	for _, State in pairs(States) do
+	for StateName, State in pairs(States) do
 		local DebugEntities = {}
 		for Entity in pairs(State.Collection) do
 			table.insert(DebugEntities, Entity)
 		end
 
-        Text ..= "\tCollection: " .. TableToString(DebugEntities) .. "\n"
+        Text = Text .. "State " .. StateName .. ": " .. TableToString(DebugEntities) .. "\n"
 	end
 
 	Text ..= "\n"

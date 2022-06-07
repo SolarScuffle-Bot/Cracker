@@ -79,41 +79,72 @@ FSM.ExitBuffer("HappyToSad")
 print("\n" .. FSM.DebugText())
 
 --[[
+Entities  ▼ table: 0xf9016b1dea5ede99 = {
+    [1] = 1,
+    [2] = 2,
+    [3] = 3,
+    [4] = 4
+} entering Happy
+
+Entities  ▼ table: 0x0f66652ac370df89 = {
+    [1] = 2,
+    [2] = 3
+} entering Angry
+
+Entities  ▼ table: 0xe6f632db9afd7719 = {
+    [1] = 1,
+    [2] = 3
+} entering Disgusted
+
+Entities  ▼ table: 0xc057c2f056678869 = {
+    [1] = 2,
+    [2] = 4
+} entering Afraid
+
+Entities  ▼ table: 0xa506be1527e0c839 = {
+    [1] = 1,
+    [2] = 4
+} exiting Happy
+
 Entity 2 is entering buffer
 Entity 3 is entering buffer
 
-Buffer HappyToSad  ▼ table: 0xa9988753c01a9292 = {
-    [1] = 2,
-    [2] = 3
-} is clearing
+Buffer HappyToSad  ▶  table: 0xf249c9715a146709  {...} is clearing
+Entities  ▼ table: 0x2fb00931243e89f9 = {
+    [1] = 3
+} exiting Disgusted
 
-Entities  ▼ table: 0xa9988753c01a9292 = {
-    [1] = 2,
-    [2] = 3
-} are exiting states  ▼ table: 0xf5cb8ee6824ee0d2 = {
-    [1] = "Disgusted",
-    [2] = "Afraid",
-    [3] = "Happy"
-} and  ▼ table: 0x6086b553fe5a4d62 = {
-    [1] = "Happy",
-    [2] = "Angry"
-}
+Entities  ▼ table: 0x2d22ac384fc216e9 = {
+    [1] = 2
+} exiting Afraid
 
-Entities  ▼ table: 0xa9988753c01a9292 = {
+Entities  ▼ table: 0xb0b532a14ad79bd9 = {
     [1] = 2,
     [2] = 3
-} are entering states   ▼ table: 0x13d1783d2f25a9f2 = {
-    [1] = "Sad",
-    [2] = "Angry"
-}
+} exiting Happy
+
+Entities  ▼ table: 0x39aa6c549e8cb9b9 = {
+    [1] = 2,
+    [2] = 3
+} exiting Angry
+
+Entities  ▼ table: 0xbcd3031c9b10ca29 = {
+    [1] = 2,
+    [2] = 3
+} entering Sad
+
+Entities  ▼ table: 0xbf409a4797a42619 = {
+    [1] = 2,
+    [2] = 3
+} entering Angry
 
 FINITE STATE MACHINE DEBUG TEXT:
 
-State Disgusted: { 1, }
-State Afraid: { 4, }
-State Sad: { 3, 2, }
-State Happy: { }
-State Angry: { 2, 3, }
+	Collection: { 1, }
+	Collection: { 4, }
+	Collection: { 3, 2, }
+	Collection: { }
+	Collection: { 3, 2, }
 
 Transition HappyToSad: {
 	Buffer: { }
@@ -121,4 +152,5 @@ Transition HappyToSad: {
 	FromAnd: { "Happy", "Angry", }
 	To: { "Sad", "Angry", }
 }
+
 ]]
