@@ -4,17 +4,27 @@ This is a data-oriented finite state machine as described in the Data Oriented D
 ## API
 
 ### Data Types
-```
+```lua
 type TransitionName_t: any;
+```
 
+```lua
 type Entity_t: any;
+```
 
+```lua
 type Buffer_t: { Entity };
+```
 
+```lua
 type StateName_t: any;
+```
 
+```lua
 type State_t: { [Entity_t]: true };
+```
 
+```lua
 type Template_t = {
     FromOr : { StateName_t }?;
     fromOr : { StateName_t }?;
@@ -31,7 +41,9 @@ type Template_t = {
     
     OnExitBuffer: (Buffer_t)? -> bool?;
 }
+```
 
+```lua
 type Transition = {
     Buffer: Buffer_t;
     
