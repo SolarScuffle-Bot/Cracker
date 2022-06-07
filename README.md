@@ -80,10 +80,6 @@ type Transition = {
     OnEnterBuffer: (Entity_t) -> bool?;
 
     OnExitBuffer: (Buffer_t) -> bool?;
-
-    OnExitFromStates: (Buffer_t, { StateName_t }, { StateName_t }) -> nil;
-
-    OnEnterToStates: (Buffer_t, { StateName_t }) -> nil;
 }
 ```
 
