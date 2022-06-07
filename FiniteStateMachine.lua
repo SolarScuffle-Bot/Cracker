@@ -37,7 +37,7 @@ Module.CreateState = function(StateName, Entities)
 	assert(not States[StateName], "State ".. StateName .. " already exists")
 
 	local State = {}
-	for _, Entity in ipairs(Entities) do
+	for _, Entity in ipairs(Entities or {}) do
 		State[Entity] = true
 	end
 
