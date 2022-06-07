@@ -18,6 +18,7 @@ type Buffer_t: { Entity_t };
 
 ```lua
 type StateName_t: any;
+```
 
 ```lua
 type StateTemplate_t: {    
