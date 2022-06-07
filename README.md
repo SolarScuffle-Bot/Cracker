@@ -59,51 +59,51 @@ type Transition = {
 
 ### Methods
 ```lua
-    .CreateTransition(TransitionName: TransitionName_t, Template: Template_t)
+.CreateTransition(TransitionName: TransitionName_t, Template: Template_t)
 ```
 Internally creates a Transition struct using the Template at TransitionName. Creates any States that do not exist at the time of calling.
 
 ```lua
-    .DeleteTransition(TransitionName: TransitionName_t)
+.DeleteTransition(TransitionName: TransitionName_t)
 ```
 Clears the Transition struct's buffer and internally deletes the Transition struct with TransitionName.
 
 ```lua
-    .GetTransition(TransitionName: TransitionName_t) -> Transition_t?
+.GetTransition(TransitionName: TransitionName_t) -> Transition_t?
 ```
 Asserts the Transition struct at TransitionName exists, then returns it. (Only recommended for debugging use)
 
 ```lua
-    .CreateState(StateName: StateName_t, Entities: { Entity_t }?)
+.CreateState(StateName: StateName_t, Entities: { Entity_t }?)
 ```
 Internally creates a State table at StateName with Entities or {}.
 
 ```lua
-    .GetState(StateName: StateName_t) -> State_t?
+.GetState(StateName: StateName_t) -> State_t?
 ```
 Returns the State table at StateName if it exists. (Only recommended for debugging use)
 
 ```lua
-    .EnterStates(StateNames: { StateName_t }, Entities: { Entity_t })
+.EnterStates(StateNames: { StateName_t }, Entities: { Entity_t })
 ```
 Sets each Entity to true in States at names listed in StateNames. Creates any States that do not exist at the time of calling.
 
 ```lua
-    .ExitStates(StateNames: { StateName_t }, Entities: { Entity_t })
+.ExitStates(StateNames: { StateName_t }, Entities: { Entity_t })
 ```
 Sets each Entity to nil in States at names listed in StateNames. Ignores non-existant States.
 
 ```lua
-    .EnterBuffer(TransitionName: TransitionName_t, Entities: { Entity_t })
+.EnterBuffer(TransitionName: TransitionName_t, Entities: { Entity_t })
 ```
 Inserts each Entity into the Transition at TransitionName's buffer if it is in all required States. Cancels before inserting if Transition.OnEnterBuffer(Entity) is truthy. Creates any States that do not exist at the time of calling.
 
 ```lua
-    .ExitBuffer(TransitionName: TransitionName_t, Entities: { Entity_t })
+.ExitBuffer(TransitionName: TransitionName_t, Entities: { Entity_t })
 ```
 Sets all Entities to nil in each From State and to true in each To State in the Transition at TransitionName. Cancels before bulk insertion if Transition.OnExitBuffer(Transition.Buffer) is truthy. Creates any States that do not exist at the time of calling. Ignores non-existant States.
 
 ```lua
-    .DebugText() -> string
+.DebugText() -> string
 ```
 Returns a string of most useful debugging information.
