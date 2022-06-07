@@ -62,14 +62,6 @@ type Template_t = {
     OnExitBuffer: (Buffer_t)? -> bool?;
     onExitBuffer: (Buffer_t)? -> bool?;
     on_exit_buffer: (Buffer_t)? -> bool?;
-
-    OnExitFromStates: (Buffer_t, { StateName_t }, { StateName_t })? -> nil
-    onExitFromStates: (Buffer_t, { StateName_t }, { StateName_t })? -> nil
-    on_exit_from_states: (Buffer_t, { StateName_t }, { StateName_t })? -> nil
-
-    OnEnterToStates: (Buffer_t, { StateName_t })? -> nil
-    onEnterToStates: (Buffer_t, { StateName_t })? -> nil
-    on_enter_to_states: (Buffer_t, { StateName_t })? -> nil
 }
 ```
 
