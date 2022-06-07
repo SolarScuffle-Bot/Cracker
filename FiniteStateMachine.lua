@@ -36,9 +36,13 @@ end
 Module.CreateState = function(StateName, Entities)
 	assert(not States[StateName], "State ".. StateName .. " already exists")
 
-	local State = Entities or {}
+	local State = {}
+	for _, Entity in ipairs(Entities) do
+		State[Entity] = true
+	end
+	
 	States[StateName] = State
-
+	
 	return State
 end
 
@@ -85,13 +89,14 @@ Module.EnterBuffer = function(TransitionName, Entities)
 		local ValidAnd = #Transition.FromAnd ~= 0
 		for _, SourceName in ipairs(Transition.FromAnd) do
 			local SourceState = Module.GetState(SourceName)
+			warn(SourceState, SourceName)
 			if not SourceState then SourceState = Module.CreateState(SourceName) end
 			if SourceState[Entity] then continue end
 
 			ValidAnd = false
 			break
 		end
-
+		
 		if not ValidOr or not ValidAnd then continue end
 		if Transition.OnEnterBuffer(Entity) then continue end
 
