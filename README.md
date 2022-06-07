@@ -93,9 +93,9 @@ type Transition = {
 
 ### Methods
 ```lua
-Module.CreateTransition(TransitionName: TransitionName_t, Template: Template_t)
+Module.CreateTransition(TransitionName: TransitionName_t, TransitionTemplate: Template_t)
 ```
-Internally creates a Transition struct using the Template at TransitionName. Creates any States that do not exist at the time of calling.
+Internally creates a Transition struct using the TransitionTemplate at TransitionName. Creates any States that do not exist at the time of calling.
 
 ```lua
 Module.DeleteTransition(TransitionName: TransitionName_t)
@@ -108,9 +108,9 @@ Module.GetTransition(TransitionName: TransitionName_t) -> Transition_t?
 Asserts the Transition struct at TransitionName exists, then returns it. (Only recommended for debugging use)
 
 ```lua
-Module.CreateState(StateName: StateName_t, Entities: { Entity_t }?)
+Module.CreateState(StateName: StateName_t, StateTemplate: StateTemplate_t?)
 ```
-Internally creates a State table at StateName with Entities or {}.
+Internally creates a State table at StateName with StateTemplate at StateName.
 
 ```lua
 Module.GetState(StateName: StateName_t) -> State_t?
