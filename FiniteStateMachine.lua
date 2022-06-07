@@ -6,16 +6,19 @@ local Module = {}
 Module.CreateTransition = function(TransitionName, TransitionTemplate)
 	assert(not Transitions[TransitionName], "Transition " .. TransitionName .. " already exists")
 
-	Transitions[TransitionName] = {
-		Buffer = {};
+	local Transition = {}
 
-		FromOr  = TransitionTemplate.FromOr  or TransitionTemplate.fromOr  or TransitionTemplate.from_or  or {};
-		FromAnd = TransitionTemplate.FromAnd or TransitionTemplate.fromAnd or TransitionTemplate.from_and or {};
-		To      = TransitionTemplate.To      or TransitionTemplate.to      or                      {};
+	Transition.Buffer = {}
 
-		OnEnterBuffer = TransitionTemplate.OnEnterBuffer or TransitionTemplate.onEnterBuffer or TransitionTemplate.on_enter_buffer or function(Entity) end;
-		OnExitBuffer  = TransitionTemplate.OnExitBuffer  or TransitionTemplate.onExitBuffer  or TransitionTemplate.on_exit_buffer  or function(Buffer) end;
-	}
+	Transition.FromOr  = TransitionTemplate.FromOr  or TransitionTemplate.fromOr  or TransitionTemplate.from_or  or {}
+	Transition.FromAnd = TransitionTemplate.FromAnd or TransitionTemplate.fromAnd or TransitionTemplate.from_and or {}
+	Transition.FromNot = TransitionTemplate.FromNot or TransitionTemplate.fromNot or TransitionTemplate.from_not or {}
+	Transition.To      = TransitionTemplate.To      or TransitionTemplate.to      or                                {}
+
+	Transition.OnEnterBuffer = TransitionTemplate.OnEnterBuffer or TransitionTemplate.onEnterBuffer or TransitionTemplate.on_enter_buffer or function(Entity) end
+	Transition.OnExitBuffer  = TransitionTemplate.OnExitBuffer  or TransitionTemplate.onExitBuffer  or TransitionTemplate.on_exit_buffer  or function(Buffer) end
+
+	Transitions[TransitionName] = Transition
 end
 
 Module.DeleteTransition = function(TransitionName)
@@ -34,14 +37,15 @@ Module.GetTransition = function(TransitionName)
 end
 
 Module.CreateState = function(StateName, StateTemplate)
-	assert(not States[StateName], "State ".. StateName .. " already exists")
+	local PreviousState = States[StateName]
+	if PreviousState then warn("State ".. StateName .. " already exists, overwriting") end
 
-	local State = {
-        Collection = {};
+	local State = PreviousState or {}
 
-        OnEnterState = StateTemplate.OnEnterState or StateTemplate.onEnterState or StateTemplate.on_enter_state or function(Entities) end;
-        OnExitState  = StateTemplate.OnExitState  or StateTemplate.onExitState  or StateTemplate.on_exit_state  or function(Entities) end;
-    }
+	State.Collection = PreviousState and PreviousState.Collection or {};
+
+	State.OnEnterState = StateTemplate.OnEnterState or StateTemplate.onEnterState or StateTemplate.on_enter_state or function(Entities) end;
+	State.OnExitState  = StateTemplate.OnExitState  or StateTemplate.onExitState  or StateTemplate.on_exit_state  or function(Entities) end;
 
 	States[StateName] = State
 
@@ -57,14 +61,14 @@ Module.EnterStates = function(StateNames, Entities)
 		local State = Module.GetState(StateName)
 		if not State then State = Module.CreateState(StateName) end
 
-        local EntitiesNotInState = {}
-        for _, Entity in ipairs(Entities) do
-            if State.Collection[Entity] then continue end
-            table.insert(EntitiesNotInState, Entity)
-        end
+		local EntitiesNotInState = {}
+		for _, Entity in ipairs(Entities) do
+			if State.Collection[Entity] then continue end
+			table.insert(EntitiesNotInState, Entity)
+		end
 
-        if #EntitiesNotInState == 0 then continue end
-        State.OnEnterState(EntitiesNotInState)
+		if #EntitiesNotInState == 0 then continue end
+		State.OnEnterState(EntitiesNotInState)
 
 		for _, Entity in ipairs(EntitiesNotInState) do
 			State.Collection[Entity] = true
@@ -77,14 +81,14 @@ Module.ExitStates = function(StateNames, Entities)
 		local State = Module.GetState(StateName)
 		if not State then continue end
 
-        local EntitiesInState = {}
-        for _, Entity in ipairs(Entities) do
-            if not State.Collection[Entity] then continue end
-            table.insert(EntitiesInState, Entity)
-        end
+		local EntitiesInState = {}
+		for _, Entity in ipairs(Entities) do
+			if not State.Collection[Entity] then continue end
+			table.insert(EntitiesInState, Entity)
+		end
 
-        if #EntitiesInState == 0 then continue end
-        State.OnExitState(EntitiesInState)
+		if #EntitiesInState == 0 then continue end
+		State.OnExitState(EntitiesInState)
 
 		for _, Entity in ipairs(EntitiesInState) do
 			State.Collection[Entity] = nil
@@ -96,6 +100,7 @@ Module.EnterBuffer = function(TransitionName, Entities)
 	local Transition = Module.GetTransition(TransitionName)
 
 	for _, Entity in ipairs(Entities) do
+
 		local ValidOr = #Transition.FromOr == 0
 		for _, SourceName in ipairs(Transition.FromOr) do
 			local SourceState = Module.GetState(SourceName)
@@ -106,7 +111,7 @@ Module.EnterBuffer = function(TransitionName, Entities)
 			break
 		end
 
-		local ValidAnd = #Transition.FromAnd ~= 0
+		local ValidAnd = true
 		for _, SourceName in ipairs(Transition.FromAnd) do
 			local SourceState = Module.GetState(SourceName)
 			if not SourceState then SourceState = Module.CreateState(SourceName) end
@@ -116,7 +121,17 @@ Module.EnterBuffer = function(TransitionName, Entities)
 			break
 		end
 
-		if not ValidOr or not ValidAnd then continue end
+		local ValidNot = true
+		for _, SourceName in ipairs(Transition.FromNot) do
+			local SourceState = Module.GetState(SourceName)
+			if not SourceState then SourceState = Module.CreateState(SourceName) end
+			if not SourceState.Collection[Entity] then continue end
+
+			ValidNot = false
+			break
+		end
+
+		if not ValidOr or not ValidAnd or not ValidNot then continue end
 		if Transition.OnEnterBuffer(Entity) then continue end
 
 		table.insert(Transition.Buffer, Entity)
@@ -129,6 +144,7 @@ Module.ExitBuffer = function(TransitionName)
 
 	Module.ExitStates(Transition.FromOr, Transition.Buffer)
 	Module.ExitStates(Transition.FromAnd, Transition.Buffer)
+	Module.ExitStates(Transition.FromNot, Transition.Buffer)
 	Module.EnterStates(Transition.To, Transition.Buffer)
 
 	table.clear(Transition.Buffer)
@@ -137,32 +153,33 @@ end
 --Extras
 
 local function TableToString(Table)
-	local result = "{ "
-	for k, v in pairs(Table) do
-		-- Check the key type (ignore any numerical keys - assume its an array)
-		if type(k) == "string" then
-			result = result.."[\""..k.."\"]".."="
+	local Result = "{ "
+	for Key, Value in pairs(Table) do
+		if type(Key) == "string" then
+			Result ..= "[\"" .. Key .. "\"]" .. "="
 		end
 
-		-- Check the value type
-		if type(v) == "table" then
-			result = result..TableToString(v)
-		elseif type(v) == "boolean" then
-			result = result..tostring(v)
-		elseif type(v) == "string" then
-			result = result.."\""..v.."\""
-		elseif type(v) == "number" then
-			result = result..v
+		if typeof(Value) == "table" then
+			Result ..= TableToString(Value)
+
+		elseif typeof(Value) == "boolean" then
+			Result ..= tostring(Value)
+
+		elseif typeof(Value) == "number" then
+			Result ..= Value
+
 		else
-			result = result.."\""..v.."\""
+			Result ..= "\"" .. Value .. "\""
 		end
-		result = result..", "
+
+		Result ..= ", "
 	end
-	-- Remove leading commas from the result
-	if result ~= "" then
-		result = result:sub(1, result:len()-1)
+
+	if Result ~= "" and Result ~= "{ " then
+		Result = string.sub(Result, 1, -3)
 	end
-	return result.." }"
+
+	return Result .. " }"
 end
 
 Module.DebugText = function()
@@ -174,7 +191,7 @@ Module.DebugText = function()
 			table.insert(DebugEntities, Entity)
 		end
 
-        Text = Text .. "State " .. StateName .. ": " .. TableToString(DebugEntities) .. "\n"
+		Text = Text .. "State " .. StateName .. ": " .. TableToString(DebugEntities) .. "\n"
 	end
 
 	Text ..= "\n"
@@ -184,6 +201,7 @@ Module.DebugText = function()
 		Text ..= "\tBuffer: " .. TableToString(Transition.Buffer) .. "\n"
 		Text ..= "\tFromOr: " .. TableToString(Transition.FromOr) .. "\n"
 		Text ..= "\tFromAnd: " .. TableToString(Transition.FromAnd) .. "\n"
+		Text ..= "\tFromNot: " .. TableToString(Transition.FromNot) .. "\n"
 		Text ..= "\tTo: " .. TableToString(Transition.To) .. "\n"
 		Text ..= "}\n"
 	end

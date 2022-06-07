@@ -51,23 +51,28 @@ FSM.CreateState("Sad", {
 })
 
 FSM.CreateTransition("HappyToSad", {
-    FromOr = {"Disgusted", "Afraid", "Happy"};
+    FromOr  = {"Disgusted", "Afraid", "Happy"};
+
     FromAnd = {"Happy", "Angry"};
-    To = {"Sad", "Angry"};
+
+    FromNot = {"Sad"};
+
+    To      = {"Sad", "Angry"};
 
     OnEnterBuffer = function(Entity)
-        print("Entity", Entity, "is entering buffer")
+        print("Entity", Entity, "is entering Buffer HappyToSad")
     end;
 
-    OnExitBuffer = function(Buffer)
+    OnExitBuffer  = function(Buffer)
         print("Buffer HappyToSad", Buffer, "is clearing")
     end;
 })
 
-FSM.EnterStates({"Happy"}, {1, 2, 3, 4})
-FSM.EnterStates({"Angry"}, {2, 3})
+FSM.EnterStates({"Happy"}    , {1, 2, 3, 4})
+FSM.EnterStates({"Angry"}    , {2, 3})
 FSM.EnterStates({"Disgusted"}, {1, 3})
-FSM.EnterStates({"Afraid"}, {2, 4})
+FSM.EnterStates({"Afraid"}   , {2, 4})
+FSM.EnterStates({"Sad"}      , {3})
 
 FSM.ExitStates({"Happy", "Angry"}, {1, 4})
 
@@ -76,81 +81,79 @@ FSM.EnterBuffer("HappyToSad", {3, 4})
 
 FSM.ExitBuffer("HappyToSad")
 
-print("\n" .. FSM.DebugText())
+print(FSM.DebugText())
 
 --[[
-Entities  ▼ table: 0xf9016b1dea5ede99 = {
+Entities {
     [1] = 1,
     [2] = 2,
     [3] = 3,
     [4] = 4
 } entering Happy
 
-Entities  ▼ table: 0x0f66652ac370df89 = {
+Entities {
     [1] = 2,
     [2] = 3
 } entering Angry
 
-Entities  ▼ table: 0xe6f632db9afd7719 = {
+Entities {
     [1] = 1,
     [2] = 3
 } entering Disgusted
 
-Entities  ▼ table: 0xc057c2f056678869 = {
+Entities {
     [1] = 2,
     [2] = 4
 } entering Afraid
 
-Entities  ▼ table: 0xa506be1527e0c839 = {
+Entities {
+    [1] = 3
+} entering Sad
+
+Entities {
     [1] = 1,
     [2] = 4
 } exiting Happy
 
-Entity 2 is entering buffer
-Entity 3 is entering buffer
+Entity 2 is entering Buffer HappyToSad
 
-Buffer HappyToSad  ▶  table: 0xf249c9715a146709  {...} is clearing
-Entities  ▼ table: 0x2fb00931243e89f9 = {
-    [1] = 3
-} exiting Disgusted
+Buffer HappyToSad {
+    [1] = 2
+} is clearing
 
-Entities  ▼ table: 0x2d22ac384fc216e9 = {
+Entities {
     [1] = 2
 } exiting Afraid
 
-Entities  ▼ table: 0xb0b532a14ad79bd9 = {
-    [1] = 2,
-    [2] = 3
+Entities {
+    [1] = 2
 } exiting Happy
 
-Entities  ▼ table: 0x39aa6c549e8cb9b9 = {
-    [1] = 2,
-    [2] = 3
+Entities {
+    [1] = 2
 } exiting Angry
 
-Entities  ▼ table: 0xbcd3031c9b10ca29 = {
-    [1] = 2,
-    [2] = 3
+Entities {
+    [1] = 2
 } entering Sad
 
-Entities  ▼ table: 0xbf409a4797a42619 = {
-    [1] = 2,
-    [2] = 3
+Entities {
+    [1] = 2
 } entering Angry
 
 FINITE STATE MACHINE DEBUG TEXT:
 
-	Collection: { 1, }
-	Collection: { 4, }
-	Collection: { 3, 2, }
-	Collection: { }
-	Collection: { 3, 2, }
+State Disgusted: { 1, 3 }
+State Afraid: { 4 }
+State Sad: { 3, 2 }
+State Happy: { 3 }
+State Angry: { 3, 2 }
 
 Transition HappyToSad: {
-	Buffer: { }
-	FromOr: { "Disgusted", "Afraid", "Happy", }
-	FromAnd: { "Happy", "Angry", }
-	To: { "Sad", "Angry", }
+	Buffer: {  }
+	FromOr: { "Disgusted", "Afraid", "Happy" }
+	FromAnd: { "Happy", "Angry" }
+	FromNot: { "Sad" }
+	To: { "Sad", "Angry" }
 }
-
 ]]

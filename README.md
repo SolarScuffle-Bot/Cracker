@@ -51,6 +51,10 @@ type Template_t = {
     FromAnd : { StateName_t }?;
     fromAnd : { StateName_t }?;
     from_and: { StateName_t }?;
+
+    FromNot : { StateName_t }?;
+    fromNot : { StateName_t }?;
+    from_not: { StateName_t }?;
     
     To: { StateName_t }?;
     to: { StateName_t }?;
