@@ -1,6 +1,6 @@
 # Cracker
 ## DOD FSM
-A data-oriented finite-state-machine as described in the Data Oriented Design book implemented in Luau. https://www.dataorienteddesign.com/dodmain/node8.html
+The data-oriented finite-state-machine as described in the Data Oriented Design book implemented in Luau. https://www.dataorienteddesign.com/dodmain/node8.html
 
 ## API
 
@@ -71,7 +71,7 @@ type Template_t = {
 ```
 
 ```lua
-type Transition = {
+type Transition_t = {
     Buffer: Buffer_t;
     
     FromOr: { StateName_t };
