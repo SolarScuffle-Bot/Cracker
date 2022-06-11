@@ -83,7 +83,8 @@ FSM.ExitBuffer("HappyToSad")
 
 print(FSM.DebugText())
 
---[[
+--[[ Output:
+
 Entities {
     [1] = 1,
     [2] = 2,
