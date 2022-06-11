@@ -150,6 +150,11 @@ Module.ExitBuffer = function(TransitionName)
 	table.clear(Transition.Buffer)
 end
 
+Module.ThroughBuffer = function(TransitionName, Entities)
+	Module.EnterBuffer(TransitionName, Entities)
+	Module.ExitBuffer(TransitionName)
+end
+
 --Extras
 
 local function TableToString(Table)

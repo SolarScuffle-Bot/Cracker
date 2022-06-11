@@ -96,7 +96,7 @@ Module.DeleteTransition(TransitionName: TransitionName_t)
 Clears the transition's buffer and deletes it.
 
 ```lua
-Module.GetTransition(TransitionName: TransitionName_t) -> Transition_t?
+Module.GetTransition(TransitionName: TransitionName_t) -> Transition_t
 ```
 Gets the transition instance but errors if it doesn't exist. (Only recommended for debugging use)
 
@@ -129,6 +129,11 @@ Inserts each entity if it is in the specified from-states but cancels before ins
 Module.ExitBuffer(TransitionName: TransitionName_t, Entities: { Entity_t })
 ```
 Removes all entities from the specified from-states and adds them to all to-states but cancels entirely if OnExitBuffer(Entity) is truthy. Ignores any states that do not exist when removing. Creates any states that do not exist when adding.
+
+```lua
+Module.PassBuffer(TransitionName: TransitionName_t, Entities: { Entity_t })
+```
+A shorthand for calling EnterBuffer and then ExitBuffer right after.
 
 ```lua
 Module.DebugText() -> string
