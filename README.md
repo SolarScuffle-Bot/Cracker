@@ -5,81 +5,85 @@ The data-oriented finite-state-machine as described in the Data Oriented Design 
 
 ### Data Types
 ```lua
-type TransitionName_t = any;
+type TransitionName_t = any --Used to access your transitions
 ```
 
 ```lua
-type Entity_t = any;
+type Entity_t = any --Literally anything you want to put into the state machine
 ```
 
 ```lua
-type Buffer_t = { Entity_t };
+type Buffer_t = { Entity_t } --The array of entities that want to complete the transition
 ```
 
 ```lua
-type StateName_t = any;
+type StateName_t = any --Used to access your states
 ```
 
 ```lua
 type StateTemplate_t = {    
-    OnEnterState: ({ Entity_t }) -> nil
-    onEnterState: ({ Entity_t }) -> nil
-    on_enter_state: ({ Entity_t }) -> nil
+    OnEnterState  : ({ Entity_t }) -> nil; 
+    onEnterState  : ({ Entity_t }) -> nil; --Called after the entities that are already in the state have been filtered out and the rest are ready to enter the state (Many different allowed versions to accomodate common casings)
+    on_enter_state: ({ Entity_t }) -> nil;
 
-    OnExitState: ({ Entity_t }) -> nil
-    onExitState: ({ Entity_t }) -> nil
-    on_exit_state: ({ Entity_t }) -> nil
+    OnExitState  : ({ Entity_t }) -> nil;
+    onExitState  : ({ Entity_t }) -> nil; --Called after the entities that are not in the state have been filtered out and the rest are ready to exit the state (Many different allowed versions to accomodate common casings)
+    on_exit_state: ({ Entity_t }) -> nil;
 };
 ```
 
 ```lua
 type State_t = {
-    Collection: { [Entity_t]: true };
+    Collection: { [Entity_t]: true }; --The lookup table entities are stored in
     
-    OnEnterState: ({ Entity_t }) -> nil
+    OnEnterState: ({ Entity_t }) -> nil; --The OnEnterState callback you optionally defined
 
-    OnExitState: ({ Entity_t }) -> nil
+    OnExitState: ({ Entity_t }) -> nil;  --The OnExitState callback you optionally defined
 };
 ```
 
 ```lua
 type Template_t = {
     FromOr : { StateName_t }?;
-    fromOr : { StateName_t }?;
+    fromOr : { StateName_t }?; --The entities must be in any of the states in this array to be allowed to enter the buffer (Allowing many different versions to accomodate common casings)
     from_or: { StateName_t }?;
     
     FromAnd : { StateName_t }?;
-    fromAnd : { StateName_t }?;
+    fromAnd : { StateName_t }?; --The entities must be in all of the states in this array to be allowed to enter the buffer (Allowing many different versions to accomodate common casings)
     from_and: { StateName_t }?;
 
     FromNot : { StateName_t }?;
-    fromNot : { StateName_t }?;
+    fromNot : { StateName_t }?; --The entities must be in none of states in this array to be allowed to enter the buffer (Allowing many different versions to accomodate common casings)
     from_not: { StateName_t }?;
     
-    To: { StateName_t }?;
+    To: { StateName_t }?; --The entities will go to all of these states when they exit the buffer (Allowing many different versions to accomodate common casings)
     to: { StateName_t }?;
     
-    OnEnterBuffer: (Entity_t)? -> bool?;
-    onEnterBuffer: (Entity_t)? -> bool?;
+    OnEnterBuffer  : (Entity_t)? -> bool?;
+    onEnterBuffer  : (Entity_t)? -> bool?; --Called right before an entity enters the buffer, if it returns a truthy value the entity will not be inserted into the buffer (Allowing many different versions to accomodate common casings)
     on_enter_buffer: (Entity_t)? -> bool?;
 
-    OnExitBuffer: (Buffer_t)? -> bool?;
-    onExitBuffer: (Buffer_t)? -> bool?;
+    OnExitBuffer  : (Buffer_t)? -> bool?;
+    onExitBuffer  : (Buffer_t)? -> bool?; --Called at the beginning of ExitBuffer, if it returns a truthy value it returns early and nothing happens to the buffer or entities (Allowing many different versions to accomodate common casings)
     on_exit_buffer: (Buffer_t)? -> bool?;
 }
 ```
 
 ```lua
 type Transition_t = {
-    Buffer: Buffer_t;
+    Buffer: Buffer_t; --The array that entities are stored in before exiting their old states and entering their new ones
     
-    FromOr: { StateName_t };
+    FromOr: { StateName_t }; --The entities must be in any of these states to be allowed to enter the buffer
     
-    FromAnd: { StateName_t };
-    
-    OnEnterBuffer: (Entity_t) -> bool?;
+    FromAnd: { StateName_t }; --The entities must be in all of these states to be allowed to enter the buffer
 
-    OnExitBuffer: (Buffer_t) -> bool?;
+    FromNot: { StateName_t };  --The entities must be in none of these states to be allowed to enter the buffer
+
+    To: { StateName_t }; --The entities will go to all of these states when they exit the buffer
+    
+    OnEnterBuffer: (Entity_t) -> bool?; --Called in EnterBuffer right before the entity enters the buffer, if it returns a truthy value the entity will not be inserted into the buffer
+
+    OnExitBuffer: (Buffer_t) -> bool?; --Called at the beginning of ExitBuffer, if it returns a truthy value it returns early and nothing happens to the buffer or entities
 }
 ```
 
@@ -88,73 +92,88 @@ type Transition_t = {
 Module.CreateTransition(TransitionName: TransitionName_t, TransitionTemplate: Template_t)
 ```
 Creates a transition with TransitionName and the properties in TransitionTemplate.
+<br /><br />
 
 ```lua
 Module.DeleteTransition(TransitionName: TransitionName_t)
 ```
 Clears the transition's buffer and deletes it.
+<br /><br />
 
 ```lua
 Module.GetTransition(TransitionName: TransitionName_t) -> Transition_t
 ```
 Gets the transition instance but errors if it doesn't exist. (Only recommended for debugging use)
+<br /><br />
 
 ```lua
 Module.CreateState(StateName: StateName_t, StateTemplate: StateTemplate_t?)
 ```
 Creates a state with StateName and the properties in StateTemplate.
+<br /><br />
 
 ```lua
 Module.GetState(StateName: StateName_t) -> State_t?
 ```
 Returns the state instance. (Only recommended for debugging use)
+<br /><br />
 
 ```lua
 Module.EnterStates(StateNames: { StateName_t }, Entities: { Entity_t })
 ```
 Adds each entity to each state in StateNames. Creates any states that do not exist.
+<br /><br />
 
 ```lua
 Module.ExitStates(StateNames: { StateName_t }, Entities: { Entity_t })
 ```
 Removes each entity from each state in StateNames. Ignores any states that do not exist.
+<br /><br />
 
 ```lua
 Module.EnterBuffer(TransitionName: TransitionName_t, Entities: { Entity_t })
 ```
 Inserts each entity if it is in the specified from-states but cancels before inserting if OnEnterBuffer(Entity) is truthy. Creates any states that do not exist.
+<br /><br />
 
 ```lua
 Module.ExitBuffer(TransitionName: TransitionName_t, Entities: { Entity_t })
 ```
 Removes all entities from the specified from-states and adds them to all to-states but cancels entirely if OnExitBuffer(Entity) is truthy. Ignores any states that do not exist when removing. Creates any states that do not exist when adding.
+<br /><br />
 
 ```lua
 Module.PassBuffer(TransitionName: TransitionName_t, Entities: { Entity_t })
 ```
-A shorthand for calling EnterBuffer and then ExitBuffer right after.
+Immediately passes the entities into and out of the buffer. A shorthand for calling EnterBuffer and then ExitBuffer right after.
+<br /><br />
 
 ```lua
 Module.DebugText() -> string
 ```
 Returns a string of useful debugging information.
+<br /><br />
 
 ```lua
 Transition.OnEnterBuffer(Entity: Entity_t) -> bool?
 ```
 Called in EnterBuffer before each entity is inserted to the buffer. If it returns a truthy value it prevents the entity from being inserted.
+<br /><br />
 
 ```lua
 Transition.OnExitBuffer(Buffer: Buffer_t) -> bool?
 ```
 Called in ExitBuffer before anything happens. If it returns a truthy value it prevents anything from happening.
+<br /><br />
 
 ```lua
 State.OnEnterState(Entities: { Entity_t })
 ```
-Called in EnterState before all entities are added into the state. If it returns a truthy value it prevents the entities from being added.
+Called during EnterState before all entities are added into the state. If it returns a truthy value it prevents any entities from being added.
+<br /><br />
 
 ```lua
 State.OnExitState(Entities: { Entity_t })
 ```
-Called in ExitState before all entities are removed from the state. If it returns a truthy value it prevents the entities from being removed.
+Called in ExitState before all entities are removed from the state. If it returns a truthy value it prevents any entities from being removed.
+<br /><br />

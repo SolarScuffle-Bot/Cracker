@@ -100,7 +100,6 @@ Module.EnterBuffer = function(TransitionName, Entities)
 	local Transition = Module.GetTransition(TransitionName)
 
 	for _, Entity in ipairs(Entities) do
-
 		local ValidOr = #Transition.FromOr == 0
 		for _, SourceName in ipairs(Transition.FromOr) do
 			local SourceState = Module.GetState(SourceName)
