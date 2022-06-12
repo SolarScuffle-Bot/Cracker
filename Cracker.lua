@@ -61,7 +61,7 @@ end
 Module.EnterStates = function(StateNames, Entities)
 	for _, StateName in ipairs(StateNames) do
 		local State = Module.GetState(StateName)
-		if not State then State = Module.CreateState(StateName) end
+		if not State then State = Module.CreateState(StateName, {}) end
 
 		local EntitiesNotInState = {}
 		for _, Entity in ipairs(Entities) do
@@ -98,6 +98,22 @@ Module.ExitStates = function(StateNames, Entities)
 	end
 end
 
+Module.ExitAllStates = function(Entities)
+	local StateNames = {}
+	for StateName in pairs(States) do
+		table.insert(StateNames, StateName)
+	end
+
+	Module.ExitStates(StateNames, Entities)
+end
+
+Module.IsInState = function(StateName, Entity)
+	local State = Module.GetState(StateName)
+	if not State then return false end
+
+	return State.Collection[Entity]
+end
+
 Module.EnterBuffer = function(TransitionName, Entities)
 	local Transition = Module.GetTransition(TransitionName)
 
@@ -105,7 +121,7 @@ Module.EnterBuffer = function(TransitionName, Entities)
 		local ValidOr = #Transition.FromOr == 0
 		for _, SourceName in ipairs(Transition.FromOr) do
 			local SourceState = Module.GetState(SourceName)
-			if not SourceState then SourceState = Module.CreateState(SourceName) end
+			if not SourceState then SourceState = Module.CreateState(SourceName, {}) end
 			if not SourceState.Collection[Entity] then continue end
 
 			ValidOr = true
@@ -115,7 +131,7 @@ Module.EnterBuffer = function(TransitionName, Entities)
 		local ValidAnd = true
 		for _, SourceName in ipairs(Transition.FromAnd) do
 			local SourceState = Module.GetState(SourceName)
-			if not SourceState then SourceState = Module.CreateState(SourceName) end
+			if not SourceState then SourceState = Module.CreateState(SourceName, {}) end
 			if SourceState.Collection[Entity] then continue end
 
 			ValidAnd = false
@@ -125,7 +141,7 @@ Module.EnterBuffer = function(TransitionName, Entities)
 		local ValidNot = true
 		for _, SourceName in ipairs(Transition.FromNot) do
 			local SourceState = Module.GetState(SourceName)
-			if not SourceState then SourceState = Module.CreateState(SourceName) end
+			if not SourceState then SourceState = Module.CreateState(SourceName, {}) end
 			if not SourceState.Collection[Entity] then continue end
 
 			ValidNot = false

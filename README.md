@@ -138,6 +138,20 @@ Removes each entity from each state in StateNames. Ignores any states that do no
 <br /><br />
 
 ```lua
+Module.ExitAllStates(Entities: { Entity_t })
+```
+[Example](./Documentation/ExitAllStates.md)<br />
+Removes each entity from all states.
+<br /><br />
+
+```lua
+Module.IsInState(StateName: StateName_t, Entity: Entity_t)
+```
+[Example](./Documentation/IsInState.md)<br />
+Returns whether the entity is in the state or not.
+<br /><br />
+
+```lua
 Module.EnterBuffer(TransitionName: TransitionName_t, Entities: { Entity_t })
 ```
 [Example](./Documentation/EnterBuffer.md)<br />
