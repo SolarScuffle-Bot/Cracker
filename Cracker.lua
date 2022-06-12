@@ -1,3 +1,5 @@
+local NullFunction = function() end
+
 local States = {}
 local Transitions = {}
 
@@ -15,8 +17,8 @@ Module.CreateTransition = function(TransitionName, TransitionTemplate)
 	Transition.FromNot = TransitionTemplate.FromNot or TransitionTemplate.fromNot or TransitionTemplate.from_not or {}
 	Transition.To      = TransitionTemplate.To      or TransitionTemplate.to      or                                {}
 
-	Transition.OnEnterBuffer = TransitionTemplate.OnEnterBuffer or TransitionTemplate.onEnterBuffer or TransitionTemplate.on_enter_buffer or function(Entity) end
-	Transition.OnExitBuffer  = TransitionTemplate.OnExitBuffer  or TransitionTemplate.onExitBuffer  or TransitionTemplate.on_exit_buffer  or function(Buffer) end
+	Transition.OnEnterBuffer = TransitionTemplate.OnEnterBuffer or TransitionTemplate.onEnterBuffer or TransitionTemplate.on_enter_buffer or NullFunction
+	Transition.OnExitBuffer  = TransitionTemplate.OnExitBuffer  or TransitionTemplate.onExitBuffer  or TransitionTemplate.on_exit_buffer  or NullFunction
 
 	Transitions[TransitionName] = Transition
 end
@@ -44,8 +46,8 @@ Module.CreateState = function(StateName, StateTemplate)
 
 	State.Collection = PreviousState and PreviousState.Collection or {};
 
-	State.OnEnterState = StateTemplate.OnEnterState or StateTemplate.onEnterState or StateTemplate.on_enter_state or function(Entities) end;
-	State.OnExitState  = StateTemplate.OnExitState  or StateTemplate.onExitState  or StateTemplate.on_exit_state  or function(Entities) end;
+	State.OnEnterState = StateTemplate.OnEnterState or StateTemplate.onEnterState or StateTemplate.on_enter_state or NullFunction;
+	State.OnExitState  = StateTemplate.OnExitState  or StateTemplate.onExitState  or StateTemplate.on_exit_state  or NullFunction;
 
 	States[StateName] = State
 
