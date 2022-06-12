@@ -1,7 +1,7 @@
 ```lua
-Module.EnterBuffer(TransitionName: TransitionName_t, Entities: { Entity_t })
+Module.ExitBuffer(TransitionName: TransitionName_t, Entities: { Entity_t })
 ```
-Inserts each entity if it is in the specified from-states but cancels before inserting if OnEnterBuffer(Entity) is truthy. Creates any states that do not exist.
+Removes all entities from the specified from-states and adds them to all to-states but cancels entirely if OnExitBuffer(Buffer) is truthy. Ignores any states that do not exist when removing.
 <br /><br />
 
 ```lua
