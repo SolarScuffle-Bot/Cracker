@@ -35,7 +35,7 @@ Cracker.CreateTransition("Dies", {
     To = { "Dead" };
 })
 
---After another 10 seconds everyone hears something in the distance
+--After 10 seconds everyone hears something in the distance
 task.wait(10)
 Cracker.PassBuffer("DetectsEnemy", Entities)
 ```
