@@ -161,7 +161,6 @@ Module.ExitBuffer = function(TransitionName)
 
 	Module.ExitStates(Transition.FromOr, Transition.Buffer)
 	Module.ExitStates(Transition.FromAnd, Transition.Buffer)
-	Module.ExitStates(Transition.FromNot, Transition.Buffer)
 	Module.EnterStates(Transition.To, Transition.Buffer)
 
 	table.clear(Transition.Buffer)
