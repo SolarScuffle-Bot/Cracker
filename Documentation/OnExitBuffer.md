@@ -23,7 +23,7 @@ Cracker.CreateTransition("DetectsEnemy", {
     end;
 
     OnExitBuffer = function(Buffer)
-        print(Buffer, "Have all detected enemies!")
+        print(Buffer, "Have each detected an enemy!")
     end;
 })
 ```

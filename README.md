@@ -169,6 +169,13 @@ Removes all entities from the specified from-states and adds them to all to-stat
 Module.PassBuffer(TransitionName: TransitionName_t, Entities: { Entity_t })
 ```
 [Example](./Documentation/PassBuffer.md)<br />
+Entities pass right past the buffer and immediately switch states.
+<br /><br />
+
+```lua
+Module.ThroughBuffer(TransitionName: TransitionName_t, Entities: { Entity_t })
+```
+[Example](./Documentation/ThroughBuffer.md)<br />
 Immediately passes the entities into and out of the buffer. A shorthand for calling EnterBuffer and then ExitBuffer right after.
 <br /><br />
 

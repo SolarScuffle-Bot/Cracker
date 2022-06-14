@@ -7,7 +7,7 @@ Called in ExitState before all entities are removed from the state. If it return
 ```lua
 Cracker.CreateState("Dead", {
     OnExitState = function(Entities)
-        print(Entities, "ARE ALIVE! FROM THE HEAVENS AND BACK THEY HAVE RETURNED")
+        print(Entities, "ARE ALIVE! FROM THE HEAVENS AND BACK THEY HAVE RETURNED!")
     end;
 })
 ```

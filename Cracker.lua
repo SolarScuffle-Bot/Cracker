@@ -82,7 +82,7 @@ Module.ExitStates = function(StateNames, Entities)
 	for _, StateName in ipairs(StateNames) do
 		local State = Module.GetState(StateName)
 		if not State then continue end
-
+		
 		local EntitiesInState = {}
 		for _, Entity in ipairs(Entities) do
 			if not State.Collection[Entity] then continue end
@@ -116,7 +116,7 @@ end
 
 Module.EnterBuffer = function(TransitionName, Entities)
 	local Transition = Module.GetTransition(TransitionName)
-
+	
 	for _, Entity in ipairs(Entities) do
 		local ValidOr = #Transition.FromOr == 0
 		for _, SourceName in ipairs(Transition.FromOr) do
@@ -147,7 +147,7 @@ Module.EnterBuffer = function(TransitionName, Entities)
 			ValidNot = false
 			break
 		end
-
+		
 		if not ValidOr or not ValidAnd or not ValidNot then continue end
 		if Transition.OnEnterBuffer(Entity) then continue end
 
@@ -167,6 +167,14 @@ Module.ExitBuffer = function(TransitionName)
 end
 
 Module.PassBuffer = function(TransitionName, Entities)
+	local Transition = Module.GetTransition(TransitionName)
+
+	Module.ExitStates(Transition.FromOr, Entities)
+	Module.ExitStates(Transition.FromAnd, Entities)
+	Module.EnterStates(Transition.To, Entities)
+end
+
+Module.ThroughBuffer = function(TransitionName, Entities)
 	Module.EnterBuffer(TransitionName, Entities)
 	Module.ExitBuffer(TransitionName)
 end

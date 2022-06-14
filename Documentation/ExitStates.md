@@ -5,17 +5,7 @@ Removes each entity from each state in StateNames. Ignores any states that do no
 <br /><br />
 
 ```lua
-local Entities = {
-    Romeo = {
-        AlertingTime = 2; --2 Seconds
-        DetectionFailChance = 0.3; --30%
-    };
-
-    Juliette = {
-        AlertingTime = 6; --6 Seconds
-        DetectionFailChance = 0.4; --40%
-    };
-    
+local Entities = {    
     --The man, the myth, the legend himself:
     BillyBobJimNoodleMan = {
         AlertingTime = 5; --5 Seconds
