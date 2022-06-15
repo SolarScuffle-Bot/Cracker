@@ -1,10 +1,12 @@
 ```lua
-Transition.OnExitBuffer(Buffer: Buffer_t) -> bool?
+Transition.BeforeExitBuffer(Buffer: Buffer_t) -> bool?
 ```
 Called in ExitBuffer before anything happens. If it returns a truthy value it prevents anything from happening.
 <br /><br />
 
 ```lua
+local ArmoryWasSabatoged = 0.7
+
 Cracker.CreateTransition("DetectsEnemy", {
     --From Patrolling or Guarding
     FromOr = { "Patrolling", "Guarding" };
@@ -15,15 +17,14 @@ Cracker.CreateTransition("DetectsEnemy", {
     --Going to Searching and Alerting
     To = { "Searching", "Alerting" };
 
-    OnEnterBuffer = function(Entity)
-        print(Entity, "Might have detected an enemy!")
+    BeforeExitBuffer = function(Buffer)
+        print(Buffer, "Have all seen an enemy, getting weapons")
 
-        --Return if the guard accidentally failed to detect an enemy
-        return math.random() <= Entity.DetectionFailChance
+        return math.random() <= ArmoryWasSabatoged
     end;
 
-    OnExitBuffer = function(Buffer)
-        print(Buffer, "Have each detected an enemy!")
+    AfterExitBuffer = function(Buffer)
+        print(Buffer, "Have all gathered their weapons, entering search for intruder")
     end;
 })
 ```

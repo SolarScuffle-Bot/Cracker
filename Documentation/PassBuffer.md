@@ -14,6 +14,6 @@ local Entities = {
     };
 }
 
---No exceptions, without any time to react, BillyBobJimNoodleMan instantly disintegrates and dies on the spot
+--No exceptions, without any time to react BillyBobJimNoodleMan instantly disintegrates and dies on the spot
 Cracker.PassBuffer("Dies", { Entities.BillyBobJimNoodleMan })
 ```

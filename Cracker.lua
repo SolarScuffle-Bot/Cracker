@@ -17,8 +17,11 @@ Module.CreateTransition = function(TransitionName, TransitionTemplate)
 	Transition.FromNot = TransitionTemplate.FromNot or TransitionTemplate.fromNot or TransitionTemplate.from_not or {}
 	Transition.To      = TransitionTemplate.To      or TransitionTemplate.to      or                                {}
 
-	Transition.OnEnterBuffer = TransitionTemplate.OnEnterBuffer or TransitionTemplate.onEnterBuffer or TransitionTemplate.on_enter_buffer or NullFunction
-	Transition.OnExitBuffer  = TransitionTemplate.OnExitBuffer  or TransitionTemplate.onExitBuffer  or TransitionTemplate.on_exit_buffer  or NullFunction
+	Transition.BeforeEnterBuffer = TransitionTemplate.BeforeEnterBuffer or TransitionTemplate.beforeEnterBuffer or TransitionTemplate.before_enter_buffer or NullFunction
+	Transition.AfterEnterBuffer  = TransitionTemplate.AfterEnterBuffer  or TransitionTemplate.afterEnterBuffer  or TransitionTemplate.after_enter_buffer  or NullFunction
+
+	Transition.BeforeExitBuffer = TransitionTemplate.BeforeExitBuffer or TransitionTemplate.beforeExitBuffer or TransitionTemplate.before_exit_buffer or NullFunction
+	Transition.AfterExitBuffer  = TransitionTemplate.AfterExitBuffer  or TransitionTemplate.afterExitBuffer  or TransitionTemplate.after_exit_buffer  or NullFunction
 
 	Transitions[TransitionName] = Transition
 end
@@ -46,8 +49,11 @@ Module.CreateState = function(StateName, StateTemplate)
 
 	State.Collection = PreviousState and PreviousState.Collection or {};
 
-	State.OnEnterState = StateTemplate.OnEnterState or StateTemplate.onEnterState or StateTemplate.on_enter_state or NullFunction;
-	State.OnExitState  = StateTemplate.OnExitState  or StateTemplate.onExitState  or StateTemplate.on_exit_state  or NullFunction;
+	State.BeforeEnterState = StateTemplate.BeforeEnterState or StateTemplate.beforeEnterState or StateTemplate.before_enter_state or NullFunction;
+	State.AfterEnterState =  StateTemplate.AfterEnterState  or StateTemplate.afterEnterState  or StateTemplate.after_enter_state  or NullFunction;
+
+	State.BeforeExitState = StateTemplate.BeforeExitState or StateTemplate.beforeExitState or StateTemplate.before_exit_state or NullFunction;
+	State.AfterExitState  = StateTemplate.AfterExitState  or StateTemplate.afterExitState  or StateTemplate.after_exit_state  or NullFunction;
 
 	States[StateName] = State
 
@@ -70,11 +76,13 @@ Module.EnterStates = function(StateNames, Entities)
 		end
 
 		if #EntitiesNotInState == 0 then continue end
-		if State.OnEnterState(EntitiesNotInState) then continue end
+		if State.BeforeEnterState(EntitiesNotInState) then continue end
 
 		for _, Entity in ipairs(EntitiesNotInState) do
 			State.Collection[Entity] = true
 		end
+
+		State.AfterEnterState(EntitiesNotInState)
 	end
 end
 
@@ -90,11 +98,13 @@ Module.ExitStates = function(StateNames, Entities)
 		end
 
 		if #EntitiesInState == 0 then continue end
-		if State.OnExitState(EntitiesInState) then continue end
+		if State.BeforeExitState(EntitiesInState) then continue end
 
 		for _, Entity in ipairs(EntitiesInState) do
 			State.Collection[Entity] = nil
 		end
+
+		State.AfterExitState(EntitiesInState)
 	end
 end
 
@@ -149,21 +159,25 @@ Module.EnterBuffer = function(TransitionName, Entities)
 		end
 		
 		if not ValidOr or not ValidAnd or not ValidNot then continue end
-		if Transition.OnEnterBuffer(Entity) then continue end
+		if Transition.BeforeEnterBuffer(Entity) then continue end
 
 		table.insert(Transition.Buffer, Entity)
+
+		Transition.AfterEnterBuffer(Entity)
 	end
 end
 
 Module.ExitBuffer = function(TransitionName)
 	local Transition = Module.GetTransition(TransitionName)
-	if Transition.OnExitBuffer(Transition.Buffer) then return end
+	if Transition.BeforeExitBuffer(Transition.Buffer) then return end
 
 	Module.ExitStates(Transition.FromOr, Transition.Buffer)
 	Module.ExitStates(Transition.FromAnd, Transition.Buffer)
 	Module.EnterStates(Transition.To, Transition.Buffer)
 
 	table.clear(Transition.Buffer)
+
+	Transition.AfterExitBuffer(Transition.Buffer)
 end
 
 Module.PassBuffer = function(TransitionName, Entities)
@@ -184,7 +198,7 @@ end
 local function TableToString(Table)
 	local Result = "{ "
 	for Key, Value in pairs(Table) do
-		if type(Key) == "string" then
+		if type(Key) ~= "table" and type(Key) ~= "number" then
 			Result ..= "[\"" .. Key .. "\"]" .. "="
 		end
 
@@ -198,7 +212,7 @@ local function TableToString(Table)
 			Result ..= Value
 
 		else
-			Result ..= "\"" .. Value .. "\""
+			Result ..= "\"" .. tostring(Value) .. "\""
 		end
 
 		Result ..= ", "

@@ -6,7 +6,7 @@ Creates a state with StateName and the properties in StateTemplate.
 
 ```lua
 Cracker.CreateState("Alerting", {
-    OnEnterState = function(Entities)
+    AfterEnterState = function(Entities)
         for _, Entity in ipairs(Entities) do
             task.delay(Entity.AlertingTime, function()
                 --Stop alerting the others now

@@ -1,7 +1,7 @@
 ```lua
-Module.CreateTransition(TransitionName: TransitionName_t, TransitionTemplate: Template_t)
+Transition.AfterEnterBuffer(Entity: Entity_t) -> bool?
 ```
-Creates a transition with TransitionName and the properties in TransitionTemplate.
+Called in EnterBuffer after each entity is inserted to the buffer.
 <br /><br />
 
 ```lua
@@ -22,20 +22,8 @@ Cracker.CreateTransition("DetectsEnemy", {
         return math.random() <= Entity.DetectionFailChance
     end;
 
-    AfterExitBuffer = function(Buffer)
-        print(Buffer, "Have all detected enemies!")
+    AfterEnterBuffer = function(Entity)
+        print(Entity, "Has detected an enemy!")
     end;
 })
-
-Cracker.CreateTransition("Dies", {
-    --The Dead cannot die
-    FromNot = { "Dead" };
-
-    --To the dust they will return
-    To = { "Dead" };
-})
-
---After 10 seconds everyone hears something in the distance
-task.wait(10)
-Cracker.PassBuffer("DetectsEnemy", Entities)
 ```

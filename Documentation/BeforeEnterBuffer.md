@@ -1,5 +1,5 @@
 ```lua
-Transition.OnEnterBuffer(Entity: Entity_t) -> bool?
+Transition.BeforeEnterBuffer(Entity: Entity_t) -> bool?
 ```
 Called in EnterBuffer before each entity is inserted to the buffer. If it returns a truthy value it prevents the entity from being inserted.
 <br /><br />
@@ -15,14 +15,14 @@ Cracker.CreateTransition("DetectsEnemy", {
     --Going to Searching and Alerting
     To = { "Searching", "Alerting" };
 
-    OnEnterBuffer = function(Entity)
+    BeforeEnterBuffer = function(Entity)
         print(Entity, "Might have detected an enemy!")
 
         --Return if the guard accidentally failed to detect an enemy
         return math.random() <= Entity.DetectionFailChance
     end;
 
-    OnExitBuffer = function(Buffer)
+    AfterExitBuffer = function(Buffer)
         print(Buffer, "Have all detected enemies!")
     end;
 })

@@ -187,29 +187,58 @@ Returns a string of useful debugging information.
 <br /><br />
 
 ```lua
-Transition.OnEnterBuffer(Entity: Entity_t) -> bool?
+Transition.BeforeEnterBuffer(Entity: Entity_t) -> bool?
 ```
-[Example](./Documentation/OnEnterBuffer.md)<br />
+[Example](./Documentation/BeforeEnterBuffer.md)<br />
 Called in EnterBuffer before each entity is inserted to the buffer. If it returns a truthy value it prevents the entity from being inserted.
 <br /><br />
 
 ```lua
-Transition.OnExitBuffer(Buffer: Buffer_t) -> bool?
+Transition.AfterEnterBuffer(Entity: Entity_t) -> bool?
 ```
-[Example](./Documentation/OnExitBuffer.md)<br />
+[Example](./Documentation/AfterEnterBuffer.md)<br />
+Called in EnterBuffer after each entity is inserted to the buffer.
+<br /><br />
+
+
+```lua
+Transition.BeforeExitBuffer(Buffer: Buffer_t) -> bool?
+```
+[Example](./Documentation/BeforeExitBuffer.md)<br />
 Called in ExitBuffer before anything happens. If it returns a truthy value it prevents anything from happening.
 <br /><br />
 
 ```lua
-State.OnEnterState(Entities: { Entity_t })
+Transition.AfterExitBuffer(Buffer: Buffer_t) -> bool?
 ```
-[Example](./Documentation/OnEnterState.md)<br />
+[Example](./Documentation/AfterExitBuffer.md)<br />
+Called in ExitBuffer before anything happens. If it returns a truthy value it prevents anything from happening.
+<br /><br />
+
+```lua
+State.BeforeEnterState(Entities: { Entity_t })
+```
+[Example](./Documentation/BeforeEnterState.md)<br />
 Called during EnterState before all entities are added into the state. If it returns a truthy value it prevents any entities from being added.
 <br /><br />
 
 ```lua
-State.OnExitState(Entities: { Entity_t })
+State.AfterEnterState(Entities: { Entity_t })
 ```
-[Example](./Documentation/OnExitState.md)<br />
+[Example](./Documentation/AfterEnterState.md)<br />
+Called during EnterState after all entities are added into the state.
+<br /><br />
+
+```lua
+State.BeforeExitState(Entities: { Entity_t })
+```
+[Example](./Documentation/BeforeExitState.md)<br />
 Called in ExitState before all entities are removed from the state. If it returns a truthy value it prevents any entities from being removed.
+<br /><br />
+
+```lua
+State.AfterExitState(Entities: { Entity_t })
+```
+[Example](./Documentation/AfterExitState.md)<br />
+Called in ExitState after all entities are removed from the state.
 <br /><br />
