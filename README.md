@@ -22,13 +22,21 @@ type StateName_t = any --Used to access your states
 
 ```lua
 type StateTemplate_t = {    
-    OnEnterState  : ({ Entity_t })? -> nil; 
-    onEnterState  : ({ Entity_t })? -> nil; --Called after the entities that are already in the state have been filtered out and the rest are ready to enter the state. (Many different allowed versions to accomodate common casings)
-    on_enter_state: ({ Entity_t })? -> nil;
+    BeforeEnterState  : ({ Entity_t })? -> nil; 
+    beforeEnterState  : ({ Entity_t })? -> nil; --Called after the entities that are already in the state have been filtered out and the rest are ready to enter the state, if it returns a truthy value the entities will not be inserted into the state (Many different allowed versions to accomodate common casings)
+    before_enter_state: ({ Entity_t })? -> nil;
 
-    OnExitState  : ({ Entity_t })? -> nil;
-    onExitState  : ({ Entity_t })? -> nil; --Called after the entities that are not in the state have been filtered out and the rest are ready to exit the state (Many different allowed versions to accomodate common casings)
-    on_exit_state: ({ Entity_t })? -> nil;
+    AfterEnterState  : ({ Entity_t })? -> nil; 
+    afterEnterState  : ({ Entity_t })? -> nil; --Called after the entities have entered the state (Many different allowed versions to accomodate common casings)
+    after_enter_state: ({ Entity_t })? -> nil;
+
+    BeforeExitState  : ({ Entity_t })? -> nil;
+    beforeExitState  : ({ Entity_t })? -> nil; --Called after the entities that are not in the state have been filtered out and the rest are ready to exit the state, if it returns a truthy value the entities will not exit from the state (Many different allowed versions to accomodate common casings)
+    before_exit_state: ({ Entity_t })? -> nil;
+
+    AfterExitState  : ({ Entity_t })? -> nil;
+    afterExitState  : ({ Entity_t })? -> nil; --Called after the entities have exited the state (Many different allowed versions to accomodate common casings)
+    after_exit_state: ({ Entity_t })? -> nil;
 };
 ```
 
@@ -59,13 +67,21 @@ type TransitionTemplate_t = {
     To: { StateName_t }?; --The entities will go to all of these states when they exit the buffer (Allowing many different versions to accomodate common casings)
     to: { StateName_t }?;
     
-    OnEnterBuffer  : (Entity_t)? -> bool?;
-    onEnterBuffer  : (Entity_t)? -> bool?; --Called right before an entity enters the buffer, if it returns a truthy value the entity will not be inserted into the buffer (Allowing many different versions to accomodate common casings)
-    on_enter_buffer: (Entity_t)? -> bool?;
+    BeforeEnterBuffer  : (Entity_t)? -> bool?;
+    beforeEnterBuffer  : (Entity_t)? -> bool?; --Called right before an entity enters the buffer, if it returns a truthy value the entity will not be inserted into the buffer (Allowing many different versions to accomodate common casings)
+    before_enter_buffer: (Entity_t)? -> bool?;
 
-    OnExitBuffer  : (Buffer_t)? -> bool?;
-    onExitBuffer  : (Buffer_t)? -> bool?; --Called at the beginning of ExitBuffer, if it returns a truthy value it returns early and nothing happens to the buffer or entities (Allowing many different versions to accomodate common casings)
-    on_exit_buffer: (Buffer_t)? -> bool?;
+    AfterEnterBuffer  : (Entity_t)? -> bool?;
+    afterEnterBuffer  : (Entity_t)? -> bool?; --Called right after an entity enters the buffer (Allowing many different versions to accomodate common casings)
+    after_enter_buffer: (Entity_t)? -> bool?;
+
+    BeforeExitBuffer  : (Buffer_t)? -> bool?;
+    beforeExitBuffer  : (Buffer_t)? -> bool?; --Called at the beginning of ExitBuffer, if it returns a truthy value it returns early and nothing happens to the buffer or entities (Allowing many different versions to accomodate common casings)
+    before_exit_buffer: (Buffer_t)? -> bool?;
+
+    AfterExitBuffer  : (Buffer_t)? -> bool?;
+    afterExitBuffer  : (Buffer_t)? -> bool?; --Called at the end of ExitBuffer (Allowing many different versions to accomodate common casings)
+    after_exit_buffer: (Buffer_t)? -> bool?;
 }
 ```
 
@@ -81,9 +97,11 @@ type Transition_t = {
 
     To: { StateName_t }; --The entities will go to all of these states when they exit the buffer. If empty it will be ignored
     
-    OnEnterBuffer: (Entity_t) -> bool?; --The OnEnterBuffer callback you optionally defined
+    BeforeEnterBuffer: (Entity_t) -> bool?; --The BeforeEnterBuffer callback you optionally defined
+    AfterEnterBuffer : (Entity_t) -> bool?; --The AfterEnterBuffer callback you optionally defined
 
-    OnExitBuffer: (Buffer_t) -> bool?; --The OnExitBuffer callback you optionally defined
+    BeforeExitBuffer: (Buffer_t) -> bool?; --The BeforeExitBuffer callback you optionally defined
+    AfterExitBuffer : (Buffer_t) -> bool?; --The AfterExitBuffer callback you optionally defined
 }
 ```
 
