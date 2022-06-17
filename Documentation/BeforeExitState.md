@@ -1,5 +1,5 @@
 ```lua
-State.BeforeExitState(Entities: { Entity_t })
+State.BeforeExitState(Entities: Array<Entity_t>)
 ```
 Called in ExitState before all entities are removed from the state. If it returns a truthy value it prevents any entities from being removed.
 <br /><br />

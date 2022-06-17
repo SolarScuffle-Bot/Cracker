@@ -1,5 +1,5 @@
 ```lua
-Module.EnterStates(StateNames: { StateName_t }, Entities: { Entity_t })
+Module.EnterStates(StateNames: Array<StateName_t>, Entities: Array<Entity_t>)
 ```
 Adds each entity to each state in StateNames. Creates any states that do not exist.
 <br /><br />

@@ -1,5 +1,5 @@
 ```lua
-State.AfterEnterState(Entities: { Entity_t })
+State.AfterEnterState(Entities: Array<Entity_t>)
 ```
 [Example](./Documentation/AfterEnterState.md)<br />
 Called during EnterState after all entities are added into the state.

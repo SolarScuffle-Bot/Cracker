@@ -1,5 +1,5 @@
 ```lua
-State.AfterExitState(Entities: { Entity_t })
+State.AfterExitState(Entities: Array<Entity_t>)
 ```
 Called in ExitState after all entities are removed from the state.
 <br /><br />

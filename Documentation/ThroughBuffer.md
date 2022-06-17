@@ -1,7 +1,7 @@
 ```lua
-Module.ThroughBuffer(TransitionName: TransitionName_t, Entities: { Entity_t })
+Module.ThroughBuffer(TransitionName: TransitionName_t, Entities: Array<Entity_t>, DontExitStates: boolean))
 ```
-Immediately enters and exits the entities right through the buffer. A shorthand for calling EnterBuffer and then ExitBuffer right after.
+Immediately enters and exits the entities right through the buffer. A shorthand for calling EnterBuffer and then ExitBuffer right after. If DontExitStates is true the entities will not be removed from their previous states.
 <br /><br />
 
 ```lua

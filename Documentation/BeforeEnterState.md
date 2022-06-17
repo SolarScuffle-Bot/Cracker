@@ -1,5 +1,5 @@
 ```lua
-State.BeforeEnterState(Entities: { Entity_t })
+State.BeforeEnterState(Entities: Array<Entity_t>)
 ```
 Called during EnterState before all entities are added into the state. If it returns a truthy value it prevents any entities from being added.
 <br /><br />

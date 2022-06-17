@@ -1,5 +1,5 @@
 ```lua
-Module.ExitStates(StateNames: { StateName_t }, Entities: { Entity_t })
+Module.ExitStates(StateNames: Array<StateName_t>, Entities: Array<Entity_t>)
 ```
 Removes each entity from each state in StateNames. Ignores any states that do not exist.
 <br /><br />

@@ -1,5 +1,5 @@
 ```lua
-Module.ExitAllStates(Entities: { Entity_t })
+Module.ExitAllStates(Entities: Array<Entity_t>)
 ```
 Removes each entity from all states.
 <br /><br />

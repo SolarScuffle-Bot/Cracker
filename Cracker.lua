@@ -35,7 +35,8 @@ export type State_t = {
 
     BeforeExitState : (Entities: Array<Entity_t>) -> nil;  --The OnExitState callback you optionally defined
     AfterExitState  : (Entities: Array<Entity_t>) -> nil;  --The OnExitState callback you optionally defined
-};
+}
+
 export type TransitionTemplate_t = {
     FromOr  : Array<StateName_t>?;
     fromOr  : Array<StateName_t>?; --The entities must be in any of the states in this array to be allowed to enter the buffer. If empty it will be ignored (Allowing many different versions to accomodate common casings)
@@ -68,6 +69,7 @@ export type TransitionTemplate_t = {
     afterExitBuffer   : (buffer: Buffer_t) -> boolean?; --Called at the end of ExitBuffer (Allowing many different versions to accomodate common casings)
     after_exit_buffer : (buffer: Buffer_t) -> boolean?;
 }
+
 export type Transition_t = {
     Buffer : Buffer_t; --The array that entities are stored in before exiting their old states and entering their new ones
 

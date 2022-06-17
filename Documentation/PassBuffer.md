@@ -1,7 +1,7 @@
 ```lua
-Module.PassBuffer(TransitionName: TransitionName_t, Entities: { Entity_t })
+Module.PassBuffer(TransitionName: TransitionName_t, Entities: Array<Entity_t>, DontExitStates: boolean)
 ```
-Entities pass right past the buffer and immediately switch states.
+Entities pass right past the buffer and immediately switch states. If DontExitStates is true the entities will not be removed from their previous states.
 <br /><br />
 
 ```lua
