@@ -44,9 +44,11 @@ type StateTemplate_t = {
 type State_t = {
     Collection: { [Entity_t]: true }; --The lookup table entities are stored in
     
-    OnEnterState: ({ Entity_t }) -> nil; --The OnEnterState callback you optionally defined
+    BeforeEnterState: ({ Entity_t }) -> nil; --The BeforeEnterState callback you optionally defined
+    AfterEnterState : ({ Entity_t }) -> nil; --The AfterEnterState callback you optionally defined
 
-    OnExitState: ({ Entity_t }) -> nil;  --The OnExitState callback you optionally defined
+    BeforeExitState: ({ Entity_t }) -> nil;  --The OnExitState callback you optionally defined
+    AfterExitState : ({ Entity_t }) -> nil;  --The OnExitState callback you optionally defined
 };
 ```
 

@@ -1,19 +1,108 @@
+--Types
+export type Array<T> = { [number]: T }
+
+export type TransitionName_t = any
+
+export type Entity_t = any
+
+export type Buffer_t = Array<Entity_t>
+
+export type StateName_t = any
+
+export type StateTemplate_t = {    
+    BeforeEnterState   : (Entities: Array<Entity_t>) -> nil; 
+    beforeEnterState   : (entities: Array<Entity_t>) -> nil; --Called after the entities that are already in the state have been filtered out and the rest are ready to enter the state, if it returns a truthy value the entities will not be inserted into the state (Many different allowed versions to accomodate common casings)
+    before_enter_state : (entities: Array<Entity_t>) -> nil;
+
+    AfterEnterState   : (Entities: Array<Entity_t>) -> nil; 
+    afterEnterState   : (entities: Array<Entity_t>) -> nil; --Called after the entities have entered the state (Many different allowed versions to accomodate common casings)
+    after_enter_state : (entities: Array<Entity_t>) -> nil;
+
+    BeforeExitState   : (Entities: Array<Entity_t>) -> nil;
+    beforeExitState   : (entities: Array<Entity_t>) -> nil; --Called after the entities that are not in the state have been filtered out and the rest are ready to exit the state, if it returns a truthy value the entities will not exit from the state (Many different allowed versions to accomodate common casings)
+    before_exit_state : (entities: Array<Entity_t>) -> nil;
+
+    AfterExitState   : (Entities: Array<Entity_t>) -> nil;
+    afterExitState   : (entities: Array<Entity_t>) -> nil; --Called after the entities have exited the state (Many different allowed versions to accomodate common casings)
+    after_exit_state : (entities: Array<Entity_t>) -> nil;
+}
+
+export type State_t = {
+    Collection : { [Entity_t]: true }; --The lookup table entities are stored in
+
+    BeforeEnterState : (Entities: Array<Entity_t>) -> nil; --The BeforeEnterState callback you optionally defined
+    AfterEnterState  : (Entities: Array<Entity_t>) -> nil; --The AfterEnterState callback you optionally defined
+
+    BeforeExitState : (Entities: Array<Entity_t>) -> nil;  --The OnExitState callback you optionally defined
+    AfterExitState  : (Entities: Array<Entity_t>) -> nil;  --The OnExitState callback you optionally defined
+};
+export type TransitionTemplate_t = {
+    FromOr  : Array<StateName_t>?;
+    fromOr  : Array<StateName_t>?; --The entities must be in any of the states in this array to be allowed to enter the buffer. If empty it will be ignored (Allowing many different versions to accomodate common casings)
+    from_or : Array<StateName_t>?;
+
+    FromAnd  : Array<StateName_t>?;
+    fromAnd  : Array<StateName_t>?; --The entities must be in all of the states in this array to be allowed to enter the buffer . If empty it will be ignored(Allowing many different versions to accomodate common casings)
+    from_and : Array<StateName_t>?;
+
+    FromNot  : Array<StateName_t>?;
+    fromNot  : Array<StateName_t>?; --The entities must be in none of states in this array to be allowed to enter the buffer. If empty it will be ignored (Allowing many different versions to accomodate common casings)
+    from_not : Array<StateName_t>?;
+
+    To : Array<StateName_t>?; --The entities will go to all of these states when they exit the buffer (Allowing many different versions to accomodate common casings)
+    to : Array<StateName_t>?;
+
+    BeforeEnterBuffer   : (Entity: Entity_t) -> boolean?;
+    beforeEnterBuffer   : (entity: Entity_t) -> boolean?; --Called right before an entity enters the buffer, if it returns a truthy value the entity will not be inserted into the buffer (Allowing many different versions to accomodate common casings)
+    before_enter_buffer : (entity: Entity_t) -> boolean?;
+
+    AfterEnterBuffer   : (Entity: Entity_t) -> boolean?;
+    afterEnterBuffer   : (entity: Entity_t) -> boolean?; --Called right after an entity enters the buffer (Allowing many different versions to accomodate common casings)
+    after_enter_buffer : (entity: Entity_t) -> boolean?;
+
+    BeforeExitBuffer   : (Buffer: Buffer_t) -> boolean?;
+    beforeExitBuffer   : (buffer: Buffer_t) -> boolean?; --Called at the beginning of ExitBuffer, if it returns a truthy value it returns early and nothing happens to the buffer or entities (Allowing many different versions to accomodate common casings)
+    before_exit_buffer : (buffer: Buffer_t) -> boolean?;
+
+    AfterExitBuffer   : (Buffer: Buffer_t) -> boolean?;
+    afterExitBuffer   : (buffer: Buffer_t) -> boolean?; --Called at the end of ExitBuffer (Allowing many different versions to accomodate common casings)
+    after_exit_buffer : (buffer: Buffer_t) -> boolean?;
+}
+export type Transition_t = {
+    Buffer : Buffer_t; --The array that entities are stored in before exiting their old states and entering their new ones
+
+    FromOr : Array<StateName_t>; --The entities must be in any of these states to be allowed to enter the buffer
+
+    FromAnd : Array<StateName_t>; --The entities must be in all of these states to be allowed to enter the buffer. If empty it will be ignored
+
+    FromNot : Array<StateName_t>;  --The entities must be in none of these states to be allowed to enter the buffer. If empty it will be ignored
+
+    To : Array<StateName_t>; --The entities will go to all of these states when they exit the buffer. If empty it will be ignored
+
+    BeforeEnterBuffer : (Buffer: Entity_t) -> boolean?; --The BeforeEnterBuffer callback you optionally defined
+    AfterEnterBuffer  : (Buffer: Entity_t) -> boolean?; --The AfterEnterBuffer callback you optionally defined
+
+    BeforeExitBuffer : (Buffer: Buffer_t) -> boolean?; --The BeforeExitBuffer callback you optionally defined
+    AfterExitBuffer  : (Buffer: Buffer_t) -> boolean?; --The AfterExitBuffer callback you optionally defined
+}
+
 --Reference to empty function to save memory
 local NullFunction = function() end
 
 --Internal data
-local States = {}
-local Transitions = {}
+local States : { [StateName_t] : State_t; } = {}
+local Transitions : { [TransitionName_t] : Transition_t; } = {}
 
 --Public api
 local Module = {}
 
-Module.CreateTransition = function(TransitionName, TransitionTemplate)
+Module.CreateTransition = function(TransitionName : TransitionName_t, TransitionTemplate : TransitionTemplate_t)
+	--Check if the transition already exists
 	--Check if transition already exists
 	assert(not Transitions[TransitionName], "Transition " .. TransitionName .. " already exists")
 
 	--Define transition
-	local Transition = {}
+	local Transition = {} :: Transition_t
 
 	Transition.Buffer = {}
 
@@ -22,19 +111,19 @@ Module.CreateTransition = function(TransitionName, TransitionTemplate)
 	Transition.FromNot = TransitionTemplate.FromNot or TransitionTemplate.fromNot or TransitionTemplate.from_not or {}
 	Transition.To      = TransitionTemplate.To      or TransitionTemplate.to      or                                {}
 
-	Transition.BeforeEnterBuffer = TransitionTemplate.BeforeEnterBuffer or TransitionTemplate.beforeEnterBuffer or TransitionTemplate.before_enter_buffer or NullFunction
-	Transition.AfterEnterBuffer  = TransitionTemplate.AfterEnterBuffer  or TransitionTemplate.afterEnterBuffer  or TransitionTemplate.after_enter_buffer  or NullFunction
+	Transition.BeforeEnterBuffer = TransitionTemplate.BeforeEnterBuffer or TransitionTemplate.beforeEnterBuffer or TransitionTemplate.before_enter_buffer or NullFunction :: (Entity_t) -> boolean?
+	Transition.AfterEnterBuffer  = TransitionTemplate.AfterEnterBuffer  or TransitionTemplate.afterEnterBuffer  or TransitionTemplate.after_enter_buffer  or NullFunction :: (Entity_t) -> nil
 
-	Transition.BeforeExitBuffer = TransitionTemplate.BeforeExitBuffer or TransitionTemplate.beforeExitBuffer or TransitionTemplate.before_exit_buffer or NullFunction
-	Transition.AfterExitBuffer  = TransitionTemplate.AfterExitBuffer  or TransitionTemplate.afterExitBuffer  or TransitionTemplate.after_exit_buffer  or NullFunction
+	Transition.BeforeExitBuffer = TransitionTemplate.BeforeExitBuffer or TransitionTemplate.beforeExitBuffer or TransitionTemplate.before_exit_buffer or NullFunction :: (Buffer_t) -> boolean?
+	Transition.AfterExitBuffer  = TransitionTemplate.AfterExitBuffer  or TransitionTemplate.afterExitBuffer  or TransitionTemplate.after_exit_buffer  or NullFunction :: (Buffer_t) -> nil
 
 	--Add transition
 	Transitions[TransitionName] = Transition
 end
 
-Module.DeleteTransition = function(TransitionName)
+Module.DeleteTransition = function(TransitionName : TransitionName_t)
 	--Get transition
-	local Transition = Transitions[TransitionName]
+	local Transition : Transition_t = Transitions[TransitionName]
 	assert(Transition, "Transition " .. TransitionName .. " does not exist")
 
 	--Remove transition
@@ -42,29 +131,29 @@ Module.DeleteTransition = function(TransitionName)
 	Transitions[TransitionName] = nil
 end
 
-Module.GetTransition = function(TransitionName)
+Module.GetTransition = function(TransitionName : TransitionName_t) : Transition_t
 	--Get transition
-	local Transition = Transitions[TransitionName]
+	local Transition : Transition_t = Transitions[TransitionName]
 	assert(Transition, "Transition " .. TransitionName .. " does not exist")
 
 	return Transition
 end
 
-Module.CreateState = function(StateName, StateTemplate)
+Module.CreateState = function(StateName : StateName_t, StateTemplate : StateTemplate_t)
 	--Check if state already exists, if so warn of overwrite
-	local PreviousState = States[StateName]
+	local PreviousState : State_t? = States[StateName]
 	if PreviousState then warn("State ".. StateName .. " already exists, overwriting") end
 
 	--Define state
-	local State = PreviousState or {}
+	local State : State_t = PreviousState or {}
 
 	State.Collection = PreviousState and PreviousState.Collection or {};
 
-	State.BeforeEnterState = StateTemplate.BeforeEnterState or StateTemplate.beforeEnterState or StateTemplate.before_enter_state or NullFunction;
-	State.AfterEnterState =  StateTemplate.AfterEnterState  or StateTemplate.afterEnterState  or StateTemplate.after_enter_state  or NullFunction;
+	State.BeforeEnterState = StateTemplate.BeforeEnterState or StateTemplate.beforeEnterState or StateTemplate.before_enter_state or NullFunction :: (Entities : Array<Entity_t>) -> boolean?;
+	State.AfterEnterState =  StateTemplate.AfterEnterState  or StateTemplate.afterEnterState  or StateTemplate.after_enter_state  or NullFunction :: (Entities : Array<Entity_t>) -> nil;
 
-	State.BeforeExitState = StateTemplate.BeforeExitState or StateTemplate.beforeExitState or StateTemplate.before_exit_state or NullFunction;
-	State.AfterExitState  = StateTemplate.AfterExitState  or StateTemplate.afterExitState  or StateTemplate.after_exit_state  or NullFunction;
+	State.BeforeExitState = StateTemplate.BeforeExitState or StateTemplate.beforeExitState or StateTemplate.before_exit_state or NullFunction :: (Entities : Array<Entity_t>) -> boolean?;
+	State.AfterExitState  = StateTemplate.AfterExitState  or StateTemplate.afterExitState  or StateTemplate.after_exit_state  or NullFunction :: (Entities : Array<Entity_t>) -> nil;
 
 	--Add state
 	States[StateName] = State
@@ -72,19 +161,19 @@ Module.CreateState = function(StateName, StateTemplate)
 	return State
 end
 
-Module.GetState = function(StateName)
+Module.GetState = function(StateName : StateName_t) : State_t?
 	return States[StateName]
 end
 
-Module.EnterStates = function(StateNames, Entities)
+Module.EnterStates = function(StateNames : Array<StateName_t>, Entities : Array<Entity_t>)
 	for _, StateName in ipairs(StateNames) do
 		--Get state, if not found create it
-		local State = Module.GetState(StateName)
+		local State = Module.GetState(StateName) :: State_t
 		if not State then State = Module.CreateState(StateName, {}) end
 
 		--Filter entities if they are in the state
-		local EntitiesNotInState = {}
-		for _, Entity in ipairs(Entities) do
+		local EntitiesNotInState : Array<Entity_t> = {}
+		for _, Entity : Entity_t in ipairs(Entities) do
 			if State.Collection[Entity] then continue end
 			table.insert(EntitiesNotInState, Entity)
 		end
@@ -105,15 +194,15 @@ Module.EnterStates = function(StateNames, Entities)
 	end
 end
 
-Module.ExitStates = function(StateNames, Entities)
+Module.ExitStates = function(StateNames : Array<StateName_t>, Entities : Array<Entity_t>)
 	for _, StateName in ipairs(StateNames) do
 		--Get state, if not found create it
-		local State = Module.GetState(StateName)
+		local State = Module.GetState(StateName) :: State_t
 		if not State then continue end
 		
 		--Filter entities if they are not in the state
-		local EntitiesInState = {}
-		for _, Entity in ipairs(Entities) do
+		local EntitiesInState : Array<Entity_t> = {}
+		for _, Entity : Entity_t in ipairs(Entities) do
 			if not State.Collection[Entity] then continue end
 			table.insert(EntitiesInState, Entity)
 		end
@@ -134,10 +223,10 @@ Module.ExitStates = function(StateNames, Entities)
 	end
 end
 
-Module.ExitAllStates = function(Entities)
+Module.ExitAllStates = function(Entities : Array<Entity_t>)
 	--Get all states
-	local StateNames = {}
-	for StateName in pairs(States) do
+	local StateNames : Array<StateName_t> = {}
+	for StateName : StateName_t in pairs(States) do
 		table.insert(StateNames, StateName)
 	end
 
@@ -145,45 +234,47 @@ Module.ExitAllStates = function(Entities)
 	Module.ExitStates(StateNames, Entities)
 end
 
-Module.IsInState = function(StateName, Entity)
+Module.IsInState = function(StateName : StateName_t, Entity : Entity_t) : boolean
 	--Get state
-	local State = Module.GetState(StateName)
+	local State = Module.GetState(StateName) :: State_t
 	if not State then return false end
 
 	return State.Collection[Entity]
 end
 
-Module.EnterBuffer = function(TransitionName, Entities)
+Module.ClearBuffer = function(TransitionName : TransitionName_t)
 	--Get transition
-	local Transition = Module.GetTransition(TransitionName)
+	local Transition : Transition_t = Module.GetTransition(TransitionName)
 
-	for _, Entity in ipairs(Entities) do
+	table.clear(Transition.Buffer)
+end
+
+Module.EnterBuffer = function(TransitionName : TransitionName_t, Entities : Array<Entity_t>)
+	--Get transition
+	local Transition : Transition_t = Module.GetTransition(TransitionName)
+
+	for _, Entity : Entity_t in ipairs(Entities) do
 		--Determine if entity fits the From requirements
-		local ValidOr = #Transition.FromOr == 0
-		for _, SourceName in ipairs(Transition.FromOr) do
-			local SourceState = Module.GetState(SourceName)
-			if not SourceState then SourceState = Module.CreateState(SourceName, {}) end
-			if not SourceState.Collection[Entity] then continue end
+		local ValidOr : boolean = #Transition.FromOr == 0
+		local ValidAnd : boolean = true
+		local ValidNot : boolean = true
+
+		for _, SourceName : StateName_t in ipairs(Transition.FromOr) do
+			if not Module.IsInState(SourceName, Entity) then continue end
 
 			ValidOr = true
 			break
 		end
 
-		local ValidAnd = true
-		for _, SourceName in ipairs(Transition.FromAnd) do
-			local SourceState = Module.GetState(SourceName)
-			if not SourceState then SourceState = Module.CreateState(SourceName, {}) end
-			if SourceState.Collection[Entity] then continue end
+		for _, SourceName : StateName_t in ipairs(Transition.FromAnd) do
+			if not Module.IsInState(SourceName, Entity) then continue end
 
 			ValidAnd = false
 			break
 		end
 
-		local ValidNot = true
-		for _, SourceName in ipairs(Transition.FromNot) do
-			local SourceState = Module.GetState(SourceName)
-			if not SourceState then SourceState = Module.CreateState(SourceName, {}) end
-			if not SourceState.Collection[Entity] then continue end
+		for _, SourceName : StateName_t in ipairs(Transition.FromNot) do
+			if not Module.IsInState(SourceName, Entity) then continue end
 
 			ValidNot = false
 			break
@@ -203,45 +294,51 @@ Module.EnterBuffer = function(TransitionName, Entities)
 	end
 end
 
-Module.ExitBuffer = function(TransitionName)
+local function CommitTransition(Transition : Transition_t, Entities : Array<Entity_t>, ShouldntExitStates : boolean)
+	--Transition entities to states
+	if not ShouldntExitStates then
+		Module.ExitStates(Transition.FromOr, Entities)
+		Module.ExitStates(Transition.FromAnd, Entities)
+	end
+
+	Module.EnterStates(Transition.To, Entities)
+end
+
+Module.ExitBuffer = function(TransitionName : TransitionName_t, ShouldntExitStates : boolean)
 	--Get transition
-	local Transition = Module.GetTransition(TransitionName)
+	local Transition : Transition_t = Module.GetTransition(TransitionName)
 
 	--Call BeforeExitBuffer, if it returns true, don't remove from buffer
 	if Transition.BeforeExitBuffer(Transition.Buffer) then return end
 
 	--Transition buffer to states
-	Module.ExitStates(Transition.FromOr, Transition.Buffer)
-	Module.ExitStates(Transition.FromAnd, Transition.Buffer)
-	Module.EnterStates(Transition.To, Transition.Buffer)
+	CommitTransition(Transition, Transition.Buffer, ShouldntExitStates)
 
-	table.clear(Transition.Buffer)
+	Module.ClearBuffer(TransitionName)
 
 	--Call AfterExitBuffer
 	Transition.AfterExitBuffer(Transition.Buffer)
 end
 
-Module.PassBuffer = function(TransitionName, Entities)
+Module.PassBuffer = function(TransitionName : TransitionName_t, Entities : Array<Entity_t>, ShouldntExitStates : boolean)
 	--Get transition
-	local Transition = Module.GetTransition(TransitionName)
+	local Transition : Transition_t = Module.GetTransition(TransitionName)
 
 	--Transition buffer to states
-	Module.ExitStates(Transition.FromOr, Entities)
-	Module.ExitStates(Transition.FromAnd, Entities)
-	Module.EnterStates(Transition.To, Entities)
+	CommitTransition(Transition, Entities, ShouldntExitStates)
 end
 
-Module.ThroughBuffer = function(TransitionName, Entities)
+Module.ThroughBuffer = function(TransitionName : TransitionName_t, Entities : Array<Entity_t>, ShouldntExitStates : boolean)
 	Module.EnterBuffer(TransitionName, Entities)
-	Module.ExitBuffer(TransitionName)
+	Module.ExitBuffer(TransitionName, ShouldntExitStates)
 end
 
 --Extras
 
-local function TableToString(Table)
-	local Result = "{ "
-	for Key, Value in pairs(Table) do
-		if type(Key) ~= "table" and type(Key) ~= "number" then
+local function TableToString(Table : table) : string
+	local Result : string = "{ "
+	for Key : any, Value : any in pairs(Table) do
+		if typeof(Key) ~= "table" and typeof(Key) ~= "number" then
 			Result ..= "[\"" .. Key .. "\"]" .. "="
 		end
 
@@ -268,21 +365,21 @@ local function TableToString(Table)
 	return Result .. " }"
 end
 
-Module.DebugText = function()
-	local Text = "FINITE STATE MACHINE DEBUG TEXT:\n\n"
+Module.DebugText = function() : string
+	local Text : string = "FINITE STATE MACHINE DEBUG TEXT:\n\n"
 
-	for StateName, State in pairs(States) do
-		local DebugEntities = {}
-		for Entity in pairs(State.Collection) do
+	for StateName : StateName_t, State : State_t in pairs(States) do
+		local DebugEntities : Array<Entity_t> = {}
+		for Entity : Entity_t in pairs(State.Collection) do
 			table.insert(DebugEntities, Entity)
 		end
 
-		Text = Text .. "State " .. StateName .. ": " .. TableToString(DebugEntities) .. "\n"
+		Text ..= "State " .. StateName .. ": " .. TableToString(DebugEntities) .. "\n"
 	end
 
 	Text ..= "\n"
 
-	for TransitionName, Transition in pairs(Transitions) do
+	for TransitionName : TransitionName_t, Transition : Transition_t in pairs(Transitions) do
 		Text ..= "Transition " .. TransitionName .. ": {\n"
 		Text ..= "\tBuffer: " .. TableToString(Transition.Buffer) .. "\n"
 		Text ..= "\tFromOr: " .. TableToString(Transition.FromOr) .. "\n"
