@@ -257,7 +257,7 @@ Module.EnterBuffer = function(TransitionName : TransitionName_t, Entities : Arra
 
 	for _, Entity : Entity_t in ipairs(Entities) do
 		--Determine if entity fits the From requirements
-		local ValidOr : boolean = #Transition.FromOr == 0
+		local ValidOr  : boolean = #Transition.FromOr == 0
 		local ValidAnd : boolean = true
 		local ValidNot : boolean = true
 
