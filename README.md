@@ -1,6 +1,6 @@
 # Cracker
 ~~The data-oriented finite-state-machine as described in the Data Oriented Design book implemented in Luau.~~ https://www.dataorienteddesign.com/dodmain/node8.html
-This is an outdated fossil that is not practical to use in normal applications. The concepts may be taken abstractly, but the code itself is substandard.
+This library is an outdated fossil that is not practical to use in normal applications. The concepts are still useful and applicable right now in any codebase, but this code itself is substandard. 
 
 ## API
 
